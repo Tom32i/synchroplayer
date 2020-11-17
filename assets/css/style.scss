@@ -1,0 +1,11 @@
+// Reset
+@import 'reset-css';
+//@import '~video.js/dist/video-js.css';
+
+// Core
+@import '@css/core/variables';
+@import '@css/core/layout';
+
+// Scenes
+@import '@css/scenes/home';
+@import '@css/scenes/room';
