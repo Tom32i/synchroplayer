@@ -22,3 +22,7 @@ start-server:
 
 start-demo:
 	php -S 0.0.0.0:8002 -t demo
+
+## Lint
+lint:
+	npx eslint src/*  --fix

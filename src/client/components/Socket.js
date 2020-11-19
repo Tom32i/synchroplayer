@@ -1,12 +1,23 @@
-import React, { Component, createRef } from 'react';
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Client from 'netcode/src/client/Client';
 import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
 import events from '@events';
-import { get } from '@client/container';
-import { socketOpen, socketClose, me, clientAdd } from '@client/store/room';
+import { socketOpen, socketClose, me, userAdd, userReady } from '@client/store/room';
 
 class Socket extends Component {
+    static propTypes = {
+        host: PropTypes.string.isRequired,
+        ready: PropTypes.bool.isRequired,
+        // Dispatchers
+        onOpen: PropTypes.func.isRequired,
+        onClose: PropTypes.func.isRequired,
+        onMe: PropTypes.func.isRequired,
+        onUser: PropTypes.func.isRequired,
+        onUserReady: PropTypes.func.isRequired,
+    };
+
     constructor(props) {
         super(props);
 
@@ -24,8 +35,9 @@ class Socket extends Component {
         this.client.addEventListener('error', this.onError);
 
         // Events
-        this.client.addEventListener('client:me', this.props.onMe);
-        this.client.addEventListener('client:add', this.props.onClient);
+        this.client.addEventListener('user:me', this.props.onMe);
+        this.client.addEventListener('user:add', this.props.onUser);
+        this.client.addEventListener('user:ready', this.props.onUserReady);
     }
 
     componentWillUnmount() {
@@ -35,12 +47,21 @@ class Socket extends Component {
         this.client.removeEventListener('error', this.onError);
 
         // Events
-        this.client.removeEventListener('client:me', this.props.onMe);
-        this.client.removeEventListener('client:add', this.props.onClient);
+        this.client.removeEventListener('user:me', this.props.onMe);
+        this.client.removeEventListener('user:add', this.props.onUser);
+        this.client.removeEventListener('user:ready', this.props.onUserReady);
 
         // Close connection
         this.client.close();
         this.props.onClose();
+    }
+
+    componentDidUpdate(prevProps) {
+        const { ready } = this.props;
+
+        if (ready && ready !== prevProps.ready) {
+            this.client.send('me:ready');
+        }
     }
 
     onOpen() {
@@ -67,12 +88,13 @@ class Socket extends Component {
 
 export default connect(
     state => ({
-        open: state.room.ready,
+        ready: state.player.ready,
     }),
     dispatch => ({
         onOpen: () => dispatch(socketOpen()),
         onClose: () => dispatch(socketClose()),
         onMe: event => dispatch(me(event.detail)),
-        onClient: event => dispatch(clientAdd(event.detail)),
+        onUser: event => dispatch(userAdd(event.detail)),
+        onUserReady: event => dispatch(userReady(event.detail)),
     })
 )(Socket);

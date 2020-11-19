@@ -1,36 +1,25 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
-import { join } from '@client/store/room';
 import Socket from '@client/components/Socket';
-import Video from '@client/components/Video';
+import Player from '@client/components/Player';
+import UserList from '@client/components/UserList';
 
 class Room extends Component {
-    componentDidMount() {
-    }
-
-    componentDidUpdate(prevProps) {
-        /*const { room, ready } = this.props;
-
-        if (room && ready && (room !== prevProps.room || ready !== prevProps.ready)) {
-            this.socket.join(room);
-        }*/
-    }
-
-    onReady() {
-
-    }
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        video: PropTypes.bool.isRequired,
+    };
 
     render(){
-        const { id, video, subtitle } = this.props;
+        const { id, video } = this.props;
 
         return (
             <div className="room">
                 <Socket host={`${get('config:protocol')}//${get('config:host')}/${id}/`} />
-                <Video video={video} subtitle={subtitle} onReady={this.onReady} />
-                <div className="controls">
-
-                </div>
+                {video ? <Player /> : null}
+                <UserList />
             </div>
         );
     }
@@ -38,8 +27,6 @@ class Room extends Component {
 
 export default connect(
     state => ({
-        ready: state.room.connected,
-        video: state.player.video,
-        subtitle: state.player.subtitle,
+        video: state.player.video !== null,
     })
 )(Room);

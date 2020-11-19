@@ -1,47 +1,31 @@
 import { loadVideo, loadSubtitle } from '@client/store/player';
 
-const VIDEO_MATCHER = new RegExp('^video\/', 'ig');
-const EXTENTION_MATCHER = new RegExp('\.(\w+)$', 'ig');
+const VIDEO_MATCHER = /^video/ig;
+const EXTENTION_MATCHER = /\.(\w+)$/ig;
 
 export default class DropHandler {
 
     constructor(store) {
         this.store = store;
 
-        //document.addEventListener('drap', this.onDrage);
-
-        this.onDragEnter = this.onDragEnter.bind(this);
         this.onDragOver = this.onDragOver.bind(this);
         this.onDrop = this.onDrop.bind(this);
         this.handleDrop = this.handleDrop.bind(this);
     }
 
     start() {
-        //document.addEventListener('drag', event => console.log('drag', event));
-        //document.addEventListener('dragend', event => console.log('dragend', event));
-        document.addEventListener('dragenter', this.onDragEnter);
-        document.addEventListener('dragexit', event => console.log('dragexit', event));
-        document.addEventListener('dragleave', event => console.log('dragleave', event));
         document.addEventListener('dragover', this.onDragOver);
-        document.addEventListener('dragstart', event => console.log('dragstart', event));
         document.addEventListener('drop', this.onDrop);
 
-        //this.store.dispatch(loadVideo('/demo/TheyLive.mp4'));
-        //this.store.dispatch(loadSubtitle('/demo/TheyLive.vtt'));
+        // this.store.dispatch(loadVideo('/demo/TheyLive.mp4'));
+        // this.store.dispatch(loadSubtitle('/demo/TheyLive.vtt'));
     }
-
-    onDragEnter(event) {
-        const { items } = event.dataTransfer;
-
-        //Array.from(items).forEach(item => console.log(item.kind, item.type));
-    }
-
     onDragOver(event) {
         event.preventDefault();
 
-        const { items } = event.dataTransfer;
+        // const { items } = event.dataTransfer;
 
-        //Array.from(items).forEach(item => console.log(item.kind, item.type));
+        // Array.from(items).forEach(item => console.log(item.kind, item.type));
     }
 
     onDrop(event) {

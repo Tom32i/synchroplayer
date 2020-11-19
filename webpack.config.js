@@ -39,7 +39,7 @@ const clientConfig = {
   },
   resolve,
   plugins: [
-    new HtmlWebpackPlugin({ template: './src/index.html' })
+    new HtmlWebpackPlugin({ template: './index.html' })
   ]
 };
 
@@ -57,7 +57,9 @@ const serverConfig = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: { presets: [[ '@babel/preset-env', { targets: { node: true } } ]] }
+          options: {
+            presets: [[ '@babel/preset-env', { targets: { node: true } } ]],
+          }
         }
       }
     ]

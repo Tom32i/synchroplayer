@@ -1,5 +1,5 @@
 import NetcodeServer from 'netcode/src/server/Server';
-//import MapClientDirectory from 'netcode/src/server/MapClientDirectory';
+// import MapClientDirectory from 'netcode/src/server/MapClientDirectory';
 import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
 import events from '@events';
 import RoomManager from '@server/room/RoomManager';
@@ -71,10 +71,10 @@ export default class Server extends NetcodeServer {
      * @param {Response} response
      */
     handleRequest(request, response) {
-        //const { url } = request;
+        // const { url } = request;
 
         // Home info
-        /*if (url === '/') {
+        /* if (url === '/') {
             response.writeHead(200, { 'Content-Type': 'application/json' });
 
             return response.end(JSON.stringify(this.getStatus()));
@@ -104,12 +104,15 @@ export default class Server extends NetcodeServer {
         const [ id ] = attributes.slice(1);
 
         this.rooms.findOrCreate(id).addClient(client);
+
+        console.info(`Client ${client.id} joined.`);
     }
 
     /**
      * @param {Client} client
      */
     onLeave(client) {
+        console.info(`Client ${client.id} left.`);
     }
 
     /**

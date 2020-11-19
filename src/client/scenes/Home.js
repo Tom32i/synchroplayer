@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { navigate } from '@client/navigation/store';
 
 class Home extends Component {
+    static propTypes = {
+        video: PropTypes.bool.isRequired,
+        join: PropTypes.func.isRequired,
+    };
+
     componentDidUpdate(prevProps) {
         const { video } = this.props;
 

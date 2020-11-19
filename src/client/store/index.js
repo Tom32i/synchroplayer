@@ -1,5 +1,5 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-//import thunkMiddleware from 'redux-thunk';
+// import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import player from '@client/store/player';
 import room from '@client/store/room';
@@ -13,7 +13,7 @@ export default function create(logState = false) {
     };
 
     const middlewares = [
-        //thunkMiddleware
+        // thunkMiddleware
     ];
 
     if (logState) {

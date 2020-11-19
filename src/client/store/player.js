@@ -1,30 +1,39 @@
-const LOAD_VIDEO = 'PLAYER_LOAD_VIDEO';
-const LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
+const PLAYER_LOAD_VIDEO = 'PLAYER_LOAD_VIDEO';
+const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
+const PLAYER_READY = 'PLAYER_READY';
 
 export function loadVideo(url) {
-    return { type: LOAD_VIDEO, payload: { url } };
+    return { type: PLAYER_LOAD_VIDEO, payload: { url } };
 }
 
 export function loadSubtitle(url) {
-    return { type: LOAD_SUBTITLE, payload: { url } };
+    return { type: PLAYER_LOAD_SUBTITLE, payload: { url } };
+}
+
+export function setReady() {
+    return { type: PLAYER_READY };
 }
 
 const initialState = {
     video: null,
     subtitle: null,
+    ready: false,
 };
 
 export default function player(state = initialState, action) {
     const { type, payload } = action;
 
     switch (type) {
-        case LOAD_VIDEO:
-          return { ...state, video: action.payload.url };
+        case PLAYER_LOAD_VIDEO:
+            return { ...state, video: payload.url, ready: false };
 
-        case LOAD_SUBTITLE:
-          return { ...state, subtitle: action.payload.url };
+        case PLAYER_LOAD_SUBTITLE:
+            return { ...state, subtitle: payload.url };
+
+        case PLAYER_READY:
+            return { ...state, ready: true };
 
         default:
-          return state
-      }
+            return state;
+    }
 }

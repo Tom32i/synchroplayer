@@ -18,6 +18,6 @@ container.registerCallback('store', createStore, ['config:debug']);
 // Services:
 container.registerService('drop-handler', DropHandler, ['store']);
 container.registerService('router', Router, ['store']);
-//container.registerService('socket', Socket, ['store', 'config:host', 'config:protocol']);
+// container.registerService('socket', Socket, ['store', 'config:host', 'config:protocol']);
 
 export default container;

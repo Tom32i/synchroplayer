@@ -1,8 +1,10 @@
 const SOCKET_OPEN = 'ROOM_SOCKET_OPEN';
 const SOCKET_CLOSE = 'ROOM_SOCKET_CLOSE';
-const ROOM_LEAVE = 'ROOM_LEAVE';
 const ROOM_ME = 'ROOM_ME';
-const ROOM_CLIENT_ADD = 'ROOM_CLIENT_ADD';
+const ROOM_USER_ADD = 'ROOM_USER_ADD';
+const ROOM_USER_READY = 'ROOM_USER_READY';
+
+// ACTIONS
 
 export function socketOpen() {
     return { type: SOCKET_OPEN };
@@ -12,35 +14,44 @@ export function socketClose() {
     return { type: SOCKET_CLOSE };
 }
 
-export function leave(id) {
-    return { type: ROOM_LEAVE };
-}
-
 export function me(id) {
     return { type: ROOM_ME, payload: { id } };
 }
 
-export function clientAdd(id) {
-    return { type: ROOM_CLIENT_ADD, payload: { id } };
+export function userAdd(id) {
+    return { type: ROOM_USER_ADD, payload: { id } };
 }
+
+export function userReady(id) {
+    return { type: ROOM_USER_READY, payload: { id } };
+}
+
+// INITIAL STATES
 
 const initialState = {
     connected: false,
     me: null,
-    clients: [],
+    users: [],
 };
 
-const initialClientState = {
+const initialUserState = {
     id: null,
 };
 
-function client(state = initialClientState, action) {
+// REDUCERS
+
+function user(state = initialUserState, action) {
     const { type, payload } = action;
 
     switch (type) {
         case ROOM_ME:
-        case ROOM_CLIENT_ADD:
-            return { ...state, id: action.id };
+        case ROOM_USER_ADD:
+            return { ...state, id: payload.id };
+
+        case ROOM_USER_READY:
+            if (payload.id !== state.id) { return state; }
+
+            return { ...state, ready: true };
 
         default:
             return state;
@@ -60,17 +71,23 @@ export default function room(state = initialState, action) {
         case ROOM_ME:
             return {
                 ...state,
-                me: action.payload.id,
-                clients: state.clients.map(clientState => client(clientState, action)),
+                me: payload.id,
+                users: state.users.map(userState => user(userState, action)),
             };
 
-        case ROOM_CLIENT_ADD:
+        case ROOM_USER_ADD:
             return {
                 ...state,
-                clients: state.clients.map(clientState => client(clientState, action)),
+                users: state.users.map(userState => user(userState, action)),
+            };
+
+        case ROOM_USER_READY:
+            return {
+                ...state,
+                users: state.users.map(userState => user(userState, action)),
             };
 
         default:
-            return state
-      }
+            return state;
+    }
 }
