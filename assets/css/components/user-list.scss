@@ -1,0 +1,16 @@
+.user-list {
+    display: flex;
+    align-items: center;
+
+    .user {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2em;
+        height: 2em;
+
+        &.loading {
+            background-color: rgba(red, 0.3);
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, createElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import User from '@client/components/User';
@@ -12,14 +12,27 @@ class UserList extends Component {
         ).isRequired,
     };
 
-    renderUser(user) {
-        return <User key={user.id} user={user}/>;
+    constructor(props) {
+        super(props);
+
+        this.renderUser = this.renderUser.bind(this);
+        this.sortById = this.sortById.bind(this);
     }
 
-    render(){
+    sortById(a, b) {
+        return a.id.toString().localeCompare(b.id.toString());
+    }
+
+    renderUser(user) {
+        return createElement(User, { key: user.id, ...user });
+    }
+
+    render() {
+        const { users } = this.props;
+
         return (
             <ul className="user-list">
-                {this.props.users.map(this.renderUser)}
+                {users.sort(this.sortById).map(this.renderUser)}
             </ul>
         );
     }

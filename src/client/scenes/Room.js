@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { get } from '@client/container';
 import Socket from '@client/components/Socket';
 import Player from '@client/components/Player';
 import UserList from '@client/components/UserList';
+import Tuto from '@client/components/Tuto';
 
 class Room extends Component {
     static propTypes = {
@@ -17,8 +17,8 @@ class Room extends Component {
 
         return (
             <div className="room">
-                <Socket host={`${get('config:protocol')}//${get('config:host')}/${id}/`} />
-                {video ? <Player /> : null}
+                <Socket room={id} />
+                {video ? <Player /> : <Tuto/>}
                 <UserList />
             </div>
         );
@@ -27,6 +27,6 @@ class Room extends Component {
 
 export default connect(
     state => ({
-        video: state.player.video !== null,
+        video: state.player.url !== null,
     })
 )(Room);

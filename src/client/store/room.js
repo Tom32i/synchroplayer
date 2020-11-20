@@ -2,6 +2,7 @@ const SOCKET_OPEN = 'ROOM_SOCKET_OPEN';
 const SOCKET_CLOSE = 'ROOM_SOCKET_CLOSE';
 const ROOM_ME = 'ROOM_ME';
 const ROOM_USER_ADD = 'ROOM_USER_ADD';
+const ROOM_USER_REMOVE = 'ROOM_USER_REMOVE';
 const ROOM_USER_READY = 'ROOM_USER_READY';
 
 // ACTIONS
@@ -22,6 +23,10 @@ export function userAdd(id) {
     return { type: ROOM_USER_ADD, payload: { id } };
 }
 
+export function userRemove(id) {
+    return { type: ROOM_USER_REMOVE, payload: { id } };
+}
+
 export function userReady(id) {
     return { type: ROOM_USER_READY, payload: { id } };
 }
@@ -36,6 +41,7 @@ const initialState = {
 
 const initialUserState = {
     id: null,
+    ready: false,
 };
 
 // REDUCERS
@@ -49,6 +55,7 @@ function user(state = initialUserState, action) {
             return { ...state, id: payload.id };
 
         case ROOM_USER_READY:
+            console.log(payload.id !== state.id);
             if (payload.id !== state.id) { return state; }
 
             return { ...state, ready: true };
@@ -72,13 +79,19 @@ export default function room(state = initialState, action) {
             return {
                 ...state,
                 me: payload.id,
-                users: state.users.map(userState => user(userState, action)),
+                users: state.users.concat([ user(undefined, action) ]),
             };
 
         case ROOM_USER_ADD:
             return {
                 ...state,
-                users: state.users.map(userState => user(userState, action)),
+                users: state.users.concat([ user(undefined, action) ]),
+            };
+
+        case ROOM_USER_REMOVE:
+            return {
+                ...state,
+                users: state.users.filter(user => user.id !== payload.id),
             };
 
         case ROOM_USER_READY:

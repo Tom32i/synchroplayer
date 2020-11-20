@@ -1,17 +1,19 @@
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setReady } from '@client/store/player';
+import { setReady, setDuration } from '@client/store/player';
 import Video from '@client/components/Video';
 import Subtitle from '@client/components/Subtitle';
 import Controls from '@client/components/Controls';
 
 class Player extends Component {
     static propTypes = {
-        video: PropTypes.string.isRequired,
+        url: PropTypes.string.isRequired,
+        playing: PropTypes.bool.isRequired,
         subtitle: PropTypes.string,
         // Dispatchers
         setReady: PropTypes.func.isRequired,
+        setDuration: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
@@ -21,15 +23,44 @@ class Player extends Component {
     constructor(props) {
         super(props);
 
-        this.video = createRef();
+        this.video = null;
+
+        this.onCanPlay = this.onCanPlay.bind(this);
+        this.onLoadedMetadata = this.onLoadedMetadata.bind(this);
+        this.setVideo = this.setVideo.bind(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        const { playing } = this.props;
+
+        if (playing !== prevProps.playing) {
+            playing ? this.video.play() : this.video.pause();
+        }
+    }
+
+    setVideo(video) {
+        this.video = video;
+    }
+
+    onCanPlay() {
+        this.props.setReady();
+    }
+
+    onLoadedMetadata() {;
+        this.props.setDuration(this.video.duration);
     }
 
     render(){
-        const { video, subtitle } = this.props;
+        const { url, subtitle } = this.props;
 
         return (
             <figure className="player">
-                <Video reference={this.video} src={video} onCanPlay={this.props.setReady}>
+                <Video
+                    ref={this.setVideo}
+                    src={url}
+                    onCanPlay={this.onCanPlay}
+                    onLoadedMetadata={this.onLoadedMetadata}
+                >
                     {subtitle ? <Subtitle src={subtitle} /> : null}
                 </Video>
                 <Controls />
@@ -40,10 +71,12 @@ class Player extends Component {
 
 export default connect(
     state => ({
-        video: state.player.video,
+        url: state.player.url,
+        playing: state.player.playing,
         subtitle: state.player.subtitle,
     }),
     dispatch => ({
-        setReady: () => dispatch(setReady())
+        setReady: () => dispatch(setReady()),
+        setDuration: duration => dispatch(setDuration(duration)),
     })
 )(Player);

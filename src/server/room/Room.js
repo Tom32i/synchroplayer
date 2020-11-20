@@ -1,42 +1,65 @@
-import MapClientDirectory from 'netcode/src/server/MapClientDirectory';
 import User from '@server/room/User';
 
 export default class Room {
     constructor(id) {
         this.id = id;
-        this.clients = new MapClientDirectory();
-        this.owner = null;
+        this.users = new Map();
 
+        this.addClient = this.addClient.bind(this);
         this.removeClient = this.removeClient.bind(this);
         this.onReady = this.onReady.bind(this);
-    }
-
-    getReady() {
-
+        this.onPlay = this.onPlay.bind(this);
+        this.onPause = this.onPause.bind(this);
     }
 
     addClient(client) {
-        this.clients.add(client);
-
-        client.user = new User();
+        const user = new User(client.id);
 
         client.on('close', this.removeClient);
         client.on('me:ready', this.onReady);
+        client.on('me:control:play', this.onPlay);
+        client.on('me:control:pause', this.onPause);
 
-        this.sendToOther(client, 'user:add', client.id);
+        this.send('user:add', user.id);
 
-        client.send('user:me', client.id);
+        this.sumUp(user, client);
+
+        this.users.set(client, user);
     }
 
     removeClient(client) {
-        client.off('close', this.removeClient);
+        const user = this.users.get(client);
 
-        this.sendToOther(client, 'user:remove', client.id);
+        this.users.delete(client);
+
+        this.send('user:remove', user.id);
+
+        client.off('close', this.removeClient);
+        client.off('me:ready', this.onReady);
+        client.off('me:control:play', this.onPlay);
+        client.off('me:control:pause', this.onPause);
     }
 
-    onReady(client) {
-        client.user.setReady();
-        this.send('user:ready', client.id);
+    sumUp(user, client) {
+        client.send('user:me', user.id);
+
+        this.users.forEach(user => client.send('user:add', user.id));
+    }
+
+    onReady(data, client) {
+        const user = this.users.get(client);
+
+        user.setReady();
+
+        this.send('user:ready', user.id);
+    }
+
+    onPlay() {
+        this.send('control:play');
+    }
+
+    onPause() {
+        this.send('control:pause');
     }
 
     /**
@@ -46,17 +69,21 @@ export default class Room {
      * @param {Object} data
      */
     send(name, data = undefined) {
-        this.clients.forEach(client => client.send(name, data));
+        this.users.forEach((user, client) => client.send(name, data));
     }
 
     /**
      * Send data to all other clients
      *
-     * @param {Client} target
+     * @param {User} target
      * @param {String} name
      * @param {Object} data
      */
     sendToOther(target, name, data = undefined) {
-        this.clients.forOther(target, client => client.send(name, data));
+        this.users.forEach((user, client) => {
+            if (user !== target) {
+                client.send(name, data);
+            }
+        });
     }
 }

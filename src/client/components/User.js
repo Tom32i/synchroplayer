@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 export default class User extends Component {
     static propTypes = {
         id: PropTypes.number.isRequired,
+        ready: PropTypes.bool.isRequired,
         name: PropTypes.string,
     };
 
@@ -12,11 +13,11 @@ export default class User extends Component {
     };
 
     render() {
-        const { id, name } = this.props;
+        const { id/* , name*/, ready } = this.props;
 
         return (
-            <li className="user">
-                {id} - {name}
+            <li className={`user ${ready ? 'ready' : 'loading'}`}>
+                {id}
             </li>
         );
     }

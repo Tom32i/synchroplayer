@@ -1,5 +1,5 @@
 import Server from '@server/core/Server';
 
-const [ port ] = process.argv.slice(2);
+const [ port, hostname ] = process.argv.slice(2);
 
-new Server(port);
+new Server(port, hostname);

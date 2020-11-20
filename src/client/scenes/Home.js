@@ -30,7 +30,7 @@ class Home extends Component {
 
 export default connect(
     state => ({
-        video: state.player.video !== null,
+        video: state.player.url !== null,
     }),
     dispatch => ({
         join: id => dispatch(navigate('room', { id })),

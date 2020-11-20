@@ -1,5 +1,6 @@
 export default class User {
-    constructor() {
+    constructor(id) {
+        this.id = id;
         this.ready = false;
     }
 
