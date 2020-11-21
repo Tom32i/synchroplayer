@@ -8,6 +8,8 @@ export default class Video extends Component {
         onLoadedMetadata: PropTypes.func,
         onAuthorized: PropTypes.func.isRequired,
         onNotAuthorized: PropTypes.func.isRequired,
+        onTimeUpdate: PropTypes.func.isRequired,
+        onDurationChange: PropTypes.func.isRequired,
         preload: PropTypes.string,
         children: PropTypes.node,
     };
@@ -31,6 +33,8 @@ export default class Video extends Component {
 
     get duration() { return this.element.duration; }
     get currentTime() { return this.element.currentTime; }
+    set currentTime(value) { this.element.currentTime = value; }
+    get currentSrc() { return this.element.currentSrc; }
 
     setElement(element) {
         this.element = element;
@@ -68,7 +72,7 @@ export default class Video extends Component {
     }
 
     render(){
-        const { src, onCanPlay, onLoadedMetadata, preload, children } = this.props;
+        const { src, onCanPlay, onLoadedMetadata, onTimeUpdate, onDurationChange, preload, children } = this.props;
 
         return (
             <video
@@ -76,6 +80,8 @@ export default class Video extends Component {
                 src={src}
                 onCanPlay={onCanPlay}
                 onLoadedMetadata={onLoadedMetadata}
+                onTimeUpdate={onTimeUpdate}
+                onDurationChange={onDurationChange}
                 preload={preload}
             >
                 {children}

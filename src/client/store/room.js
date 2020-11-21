@@ -94,7 +94,6 @@ export default function room(state = initialState, action) {
             };
 
         case ROOM_USER_READY:
-            console.log(ROOM_USER_READY, payload);
             return {
                 ...state,
                 users: state.users.map(userState => user(userState, action)),

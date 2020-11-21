@@ -7,6 +7,7 @@ import { setReady, setDuration } from '@client/store/player';
 import Video from '@client/components/Video';
 import Subtitle from '@client/components/Subtitle';
 import Controls from '@client/components/Controls';
+import Timeline from '@client/components/Timeline';
 import Modal from '@client/components/Modal';
 
 class Player extends Component {
@@ -30,12 +31,17 @@ class Player extends Component {
         this.video = null;
         this.state = {
             authorized: true,
+            time: 0,
+            duration: 0,
         };
 
         this.onCanPlay = this.onCanPlay.bind(this);
+        this.onTimeUpdate = this.onTimeUpdate.bind(this);
+        this.onDurationChange = this.onDurationChange.bind(this);
         this.onLoadedMetadata = this.onLoadedMetadata.bind(this);
         this.onAuthorized = this.onAuthorized.bind(this);
         this.onNotAuthorized = this.onNotAuthorized.bind(this);
+        this.onSeek = this.onSeek.bind(this);
         this.setVideo = this.setVideo.bind(this);
     }
 
@@ -59,6 +65,20 @@ class Player extends Component {
         this.props.setDuration(this.video.duration);
     }
 
+    onTimeUpdate() {
+        this.setState({ time: this.video.currentTime });
+    }
+
+    onDurationChange() {
+        this.setState({ duration: this.video.duration });
+    }
+
+    onSeek(progress) {
+        if (typeof progress === 'number' && !isNaN(progress)) {
+            this.video.currentTime = progress * this.video.duration;
+        }
+    }
+
     /**
      * Play authorized
      */
@@ -71,7 +91,6 @@ class Player extends Component {
      * Auto play not authorized
      */
     onNotAuthorized(error) {
-        console.log('onNotAuthorized', error);
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
             this.setState({ authorized: false });
             this.props.setReady(false);
@@ -96,7 +115,7 @@ class Player extends Component {
 
     render(){
         const { url, subtitle } = this.props;
-        const { authorized } = this.state;
+        const { authorized, time, duration } = this.state;
 
         return (
             <figure className="player">
@@ -106,12 +125,17 @@ class Player extends Component {
                     src={url}
                     onCanPlay={this.onCanPlay}
                     onLoadedMetadata={this.onLoadedMetadata}
+                    onTimeUpdate={this.onTimeUpdate}
+                    onDurationChange={this.onDurationChange}
                     onAuthorized={this.onAuthorized}
                     onNotAuthorized={this.onNotAuthorized}
                 >
                     {subtitle ? <Subtitle src={subtitle} /> : null}
                 </Video>
-                <Controls />
+                <div className="player-bottom-bar">
+                    <Timeline time={time} duration={duration} onSeek={this.onSeek} />
+                    <Controls />
+                </div>
             </figure>
         );
     }

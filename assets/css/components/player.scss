@@ -14,20 +14,48 @@
     }
 }
 
-.player-controls {
+.player-bottom-bar {
     position: absolute;
     bottom: 0;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background: linear-gradient(rgba(0, 0, 0, 0) 23%, rgba(0, 0, 0, 0.66) 100%);
+}
+
+.player-timeline {
+    margin: 0 20px;
+
+    /*progress {
+        width: 100%;
+        appearance: none;
+        background-color: rgba($color-light, 0.8);
+
+        &:not([value]) {
+           background-color: rgba($color-light, 0.5);
+        }
+
+        &:progress-bar {
+            background-color: red;
+        }
+
+        &:progress-value {
+            background-color: $color-primary;
+        }
+    }*/
+}
+
+.player-controls {
     font-size: 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(rgba(0, 0, 0, 0) 23%, rgba(0, 0, 0, 0.66) 100%);
 
     button {
         font-size: 40px;
         width: 2em;
-        height: 2em;
+        height: 1.5em;
         color: white;
         display: flex;
         align-items: center;

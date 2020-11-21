@@ -44,12 +44,10 @@ export default class Api {
     }
 
     ready(ready) {
-        console.log('I\'m ready?', ready);
         this.client.send('user:ready', { id: 0, ready });
     }
 
     loadVideo(source, name, duration, url) {
-        console.log('loadVideo', { source, name, duration, url });
         this.client.send(`video:${source}`, { url, name, duration });
     }
 }

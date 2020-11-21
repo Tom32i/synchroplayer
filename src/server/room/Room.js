@@ -122,7 +122,7 @@ export default class Room {
 
         this.video = video;
 
-        console.log('new video', this.video.name);
+        console.info('Loaded video:', source, url, name);
     }
 
     onUserReady(event) {
