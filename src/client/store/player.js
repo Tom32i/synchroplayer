@@ -2,6 +2,7 @@ const PLAYER_LOAD_FROM_FILE = 'PLAYER_LOAD_FROM_FILE';
 const PLAYER_LOAD_FROM_URL = 'PLAYER_LOAD_FROM_URL';
 const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
 const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
+const PLAYER_COMPLETE_FROM_FILE = 'PLAYER_COMPLETE_FROM_FILE';
 const PLAYER_SET_DURATION = 'PLAYER_SET_DURATION';
 const PLAYER_READY = 'PLAYER_READY';
 const PLAYER_PLAY = 'PLAYER_PLAY';
@@ -17,6 +18,10 @@ export function loadVideoFromUrl(url, name, size, type) {
 
 export function loadVideoFromServer(source, name, duration, url = null) {
     return { type: PLAYER_LOAD_FROM_SERVER, payload: { source, name, duration, url } };
+}
+
+export function completeVideoFromFile(url, name, size, type = null) {
+    return { type: PLAYER_COMPLETE_FROM_FILE, payload: { url, name, size, type } };
 }
 
 export function loadSubtitle(url) {
@@ -87,6 +92,16 @@ export default function player(state = initialState, action) {
                 source: payload.source,
                 ready: false,
                 fromServer: true,
+            };
+
+        case PLAYER_COMPLETE_FROM_FILE:
+            return {
+                ...state,
+                url: payload.url,
+                name: payload.name,
+                type: payload.type,
+                size: payload.size,
+                ready: false,
             };
 
         case PLAYER_SET_DURATION:

@@ -1,4 +1,4 @@
-import { loadVideoFromFile, loadVideoFromUrl, loadSubtitle } from '@client/store/player';
+import { loadVideoFromFile, loadVideoFromUrl, loadSubtitle, completeVideoFromFile } from '@client/store/player';
 import HeadRequest from '@client/http/HeadRequest';
 
 const TYPE_VIDEO_MATCHER = /^video/i;
@@ -57,8 +57,12 @@ export default class DropHandler {
         const { name, type, size } = file;
 
         if (type.match(TYPE_VIDEO_MATCHER)) {
+            const { player } = this.store.getState();
+            const isFileFromServer = player.source === 'file' && player.fromServer;
+            const action = isFileFromServer ? completeVideoFromFile : loadVideoFromFile;
+
             return this.store.dispatch(
-                loadVideoFromFile(URL.createObjectURL(file), name, size, type)
+                action(URL.createObjectURL(file), name, size, type)
             );
         }
 
