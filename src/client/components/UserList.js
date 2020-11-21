@@ -5,11 +5,16 @@ import User from '@client/components/User';
 
 class UserList extends Component {
     static propTypes = {
+        me: PropTypes.number,
         users: PropTypes.arrayOf(
             PropTypes.shape({
                 id: PropTypes.number.isRequired,
             })
         ).isRequired,
+    };
+
+    static defaultProps = {
+        me: null,
     };
 
     constructor(props) {
@@ -24,7 +29,9 @@ class UserList extends Component {
     }
 
     renderUser(user) {
-        return createElement(User, { key: user.id, ...user });
+        const { me } = this.props;
+
+        return createElement(User, { key: user.id, me: me === user.id, ...user });
     }
 
     render() {
@@ -41,5 +48,6 @@ class UserList extends Component {
 export default connect(
     state => ({
         users: state.room.users,
+        me: state.room.me,
     })
 )(UserList);

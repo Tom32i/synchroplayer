@@ -1,0 +1,9 @@
+{
+    "player": {
+        "authorization": {
+            "title": "Autoriser la lecture ?",
+            "content": "Sur ce navigateur, Syncroplayer a besoin de votre autorisation pour lancer la video.",
+            "ok": "Accepter"
+        }
+    }
+}

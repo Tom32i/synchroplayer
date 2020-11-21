@@ -6,6 +6,8 @@ export default class Video extends Component {
         src: PropTypes.string.isRequired,
         onCanPlay: PropTypes.func,
         onLoadedMetadata: PropTypes.func,
+        onAuthorized: PropTypes.func.isRequired,
+        onNotAuthorized: PropTypes.func.isRequired,
         preload: PropTypes.string,
         children: PropTypes.node,
     };
@@ -23,6 +25,8 @@ export default class Video extends Component {
         this.element = null;
 
         this.setElement = this.setElement.bind(this);
+        this.play = this.play.bind(this);
+        this.onError = this.onError.bind(this);
     }
 
     get duration() { return this.element.duration; }
@@ -30,21 +34,37 @@ export default class Video extends Component {
 
     setElement(element) {
         this.element = element;
-
-        console.log('videoTracks', element.videoTracks);
-        console.log('audioTracks', element.audioTracks);
-        console.log('textTracks', element.textTracks);
-        console.log('type', element.type);
-        console.log('size', element.size);
-        console.log(Object.keys(element))
     }
 
     play() {
-        this.element.play();
+        const { onAuthorized, onNotAuthorized } = this.props;
+
+        let promise = null;
+
+        try {
+            promise = this.element.play();
+        } catch (error) {
+            onNotAuthorized(error);
+        }
+
+        if (promise) {
+            promise.then(onAuthorized).catch(onNotAuthorized);
+        } else {
+            onAuthorized();
+        }
     }
 
     pause() {
         this.element.pause();
+    }
+
+    /**
+     * Video load error
+     *
+     * @param {Error} error
+     */
+    onError(error) {
+        console.error(error);
     }
 
     render(){

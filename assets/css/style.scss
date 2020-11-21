@@ -4,6 +4,7 @@
 
 // Core
 @import '@css/core/variables';
+@import '@css/core/icons';
 @import '@css/core/layout';
 
 // Scenes
@@ -13,3 +14,5 @@
 // Components
 @import '@css/components/player';
 @import '@css/components/user-list';
+@import '@css/components/modal';
+@import '@css/components/buttons';

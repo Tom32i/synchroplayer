@@ -3,7 +3,7 @@ import HeadRequest from '@client/http/HeadRequest';
 
 const TYPE_VIDEO_MATCHER = /^video/i;
 const EXTENTION_MATCHER = /\.(\w+)$/i;
-const URL_MATCHER = /^https?:\/\/.+\/([^\/]+\.\w+)$/i;
+const URL_MATCHER = /^https?:\/\/.+\/([^/]+\.\w+)$/i;
 
 export default class DropHandler {
     constructor(store) {
@@ -20,16 +20,9 @@ export default class DropHandler {
         document.addEventListener('dragover', this.onDragOver);
         document.addEventListener('drop', this.onDrop);
         document.addEventListener('paste', this.onPaste);
-
-        // this.store.dispatch(loadVideo('/demo/TheyLive.mp4'));
-        // this.store.dispatch(loadSubtitle('/demo/TheyLive.vtt'));
     }
     onDragOver(event) {
         event.preventDefault();
-
-        // const { items } = event.dataTransfer;
-
-        // Array.from(items).forEach(item => console.log(item.kind, item.type));
     }
 
     onDrop(event) {
@@ -49,8 +42,6 @@ export default class DropHandler {
     handleDrop(item) {
         const { kind, type } = item;
 
-        console.log(kind, type);
-
         if (kind === 'file') {
             return this.handleFile(item.getAsFile());
         }
@@ -64,16 +55,15 @@ export default class DropHandler {
 
     handleFile(file) {
         const { name, type, size } = file;
-        console.log('handleFile', { name, type, size });
+
         if (type.match(TYPE_VIDEO_MATCHER)) {
-            new HeadRequest(URL.createObjectURL(file), data => console.log(data), error => console.error(error));
             return this.store.dispatch(
                 loadVideoFromFile(URL.createObjectURL(file), name, size, type)
             );
         }
 
         const matches = name.match(EXTENTION_MATCHER);
-        console.log(matches);
+
         if (matches) {
             switch (matches[1]) {
                 case 'srt':
@@ -86,8 +76,6 @@ export default class DropHandler {
     }
 
     handleText(value) {
-        console.log('handleText', value);
-
         const matches = value.trim().match(URL_MATCHER);
 
         if (matches) {

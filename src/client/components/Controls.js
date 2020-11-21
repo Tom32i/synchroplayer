@@ -14,24 +14,58 @@ class Controls extends Component {
 
         this.api = get('api');
 
-        this.onPlay = this.onPlay.bind(this);
-        this.onPause = this.onPause.bind(this);
+        this.onStop = this.onStop.bind(this);
+        this.togglePlay = this.togglePlay.bind(this);
+        this.toggleFullscreen = this.toggleFullscreen.bind(this);
+        this.goBackward = this.goBackward.bind(this);
+        this.goForward = this.goForward.bind(this);
     }
 
-    onPlay() {
-        this.api.play();
+    get fullscreen() {
+        return !!document.fullscreenElement;
     }
 
-    onPause() {
-        this.api.pause();
+    onStop() {
+        this.api.stop();
+    }
+
+    togglePlay() {
+        this.props.playing ? this.api.pause() : this.api.play();
+    }
+
+    toggleFullscreen() {
+        if (this.fullscreen) {
+            document.exitFullscreen();
+        } else if (document.exitFullscreen) {
+            document.documentElement.requestFullscreen();
+        }
+    }
+
+    goBackward() {
+
+    }
+    goForward() {
+
     }
 
     render() {
         const { playing } = this.props;
+        const playIcon = playing ? 'icon-pause' : 'icon-play';
+        const screenIcon = this.fullscreen ? 'icon-minimise' : 'icon-maximise';
 
         return (
-            <div className="player-contols">
-                {playing ? <Button label="⏸" onClick={this.onPause} /> : <Button label="▶️" onClick={this.onPlay} />}
+            <div className="player-controls">
+                <div className="group">
+                    <Button label={<span className="icon-stop" />} onClick={this.onStop} />
+                </div>
+                <div className="group">
+                    <Button label={<span className="icon-backward" onClick={this.goBackward} />} />
+                    <Button label={<span className={playIcon} />} onClick={this.togglePlay} />
+                    <Button label={<span className="icon-forward" onClick={this.goForward} />} />
+                </div>
+                <div className="group">
+                    <Button label={<span className={screenIcon} />} onClick={this.toggleFullscreen} />
+                </div>
             </div>
         );
     }

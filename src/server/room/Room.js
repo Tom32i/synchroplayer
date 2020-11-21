@@ -1,65 +1,148 @@
 import User from '@server/room/User';
+import Video from '@server/room/Video';
 
 export default class Room {
     constructor(id) {
         this.id = id;
         this.users = new Map();
+        this.video = null;
 
         this.addClient = this.addClient.bind(this);
         this.removeClient = this.removeClient.bind(this);
-        this.onReady = this.onReady.bind(this);
-        this.onPlay = this.onPlay.bind(this);
-        this.onPause = this.onPause.bind(this);
+        this.onClientReady = this.onClientReady.bind(this);
+        this.onClientPlay = this.onClientPlay.bind(this);
+        this.onClientPause = this.onClientPause.bind(this);
+        this.onClientVideoFile = this.onClientVideoFile.bind(this);
+        this.onClientVideoUrl = this.onClientVideoUrl.bind(this);
+        this.onUserReady = this.onUserReady.bind(this);
+        this.onVideoPlaying = this.onVideoPlaying.bind(this);
     }
 
     addClient(client) {
-        const user = new User(client.id);
+        this.createUser(client);
 
         client.on('close', this.removeClient);
-        client.on('me:ready', this.onReady);
-        client.on('me:control:play', this.onPlay);
-        client.on('me:control:pause', this.onPause);
-
-        this.send('user:add', user.id);
-
-        this.sumUp(user, client);
-
-        this.users.set(client, user);
+        client.on('user:ready', this.onClientReady);
+        client.on('control:play', this.onClientPlay);
+        client.on('control:pause', this.onClientPause);
+        client.on('video:file', this.onClientVideoFile);
+        client.on('video:url', this.onClientVideoUrl);
     }
 
     removeClient(client) {
+        this.removeUser(client);
+
+        client.off('close', this.removeClient);
+        client.off('user:ready', this.onClientReady);
+        client.off('control:play', this.onClientPlay);
+        client.off('control:pause', this.onClientPause);
+        client.off('video:file', this.onClientVideoFile);
+        client.off('video:url', this.onClientVideoUrl);
+    }
+
+    createUser(client) {
+        const user = new User(client.id);
+
+        this.send('user:add', user.id);
+        this.sumUp(client, user);
+
+        this.users.set(client, user);
+
+        user.on('ready', this.onUserReady);
+
+        if (this.video) {
+            this.video.pause();
+        }
+    }
+
+    removeUser(client) {
         const user = this.users.get(client);
 
         this.users.delete(client);
 
         this.send('user:remove', user.id);
 
-        client.off('close', this.removeClient);
-        client.off('me:ready', this.onReady);
-        client.off('me:control:play', this.onPlay);
-        client.off('me:control:pause', this.onPause);
+        user.off('ready', this.onUserReady);
+
+        if (this.video) {
+            this.video.pause();
+        }
     }
 
-    sumUp(user, client) {
+    sumUp(client, user) {
         client.send('user:me', user.id);
 
-        this.users.forEach(user => client.send('user:add', user.id));
+        this.users.forEach(user => {
+            client.send('user:add', user.id);
+            client.send('user:ready', user);
+        });
+
+        if (this.video) {
+            const { source, url, name, duration } = this.video;
+
+            client.send(`video:${source}`, { url, name, duration });
+        }
     }
 
-    onReady(data, client) {
-        const user = this.users.get(client);
-
-        user.setReady();
-
-        this.send('user:ready', user.id);
+    onClientReady(data, client) {
+        this.users.get(client).setReady(data.ready);
     }
 
-    onPlay() {
-        this.send('control:play');
+    onClientPlay() {
+        if (!this.video) { return; }
+
+        this.video.play();
     }
 
-    onPause() {
-        this.send('control:pause');
+    onClientPause() {
+        if (!this.video) { return; }
+
+        this.video.pause();
+    }
+
+    onClientVideoFile(data, client) {
+        this.setVideo(new Video('file', null, data.name, data.duration), client);
+    }
+
+    onClientVideoUrl(data, client) {
+        this.setVideo(new Video('url', data.url, data.name, data.duration), client);
+    }
+
+    setVideo(video, client) {
+        if (this.video) {
+            console.warn('Video already set');
+            this.video.off('playing', this.onVideoPlaying);
+        }
+
+        video.on('playing', this.onVideoPlaying);
+
+        const { source, url, name, duration } = video;
+
+        this.sendToOther(client, `video:${source}`, { url, name, duration });
+
+        this.video = video;
+
+        console.log('new video', this.video.name);
+    }
+
+    onUserReady(event) {
+        const user = event.detail;
+
+        this.send('user:ready', user);
+
+        if (!user.ready) {
+            this.video.pause();
+        }
+    }
+
+    onVideoPlaying() {
+        if (this.video.playing) {
+            this.send('control:play');
+            console.warn('Video playing.');
+        } else {
+            this.send('control:pause');
+            console.warn('Video paused.');
+        }
     }
 
     /**
@@ -75,13 +158,13 @@ export default class Room {
     /**
      * Send data to all other clients
      *
-     * @param {User} target
+     * @param {User|Client} target
      * @param {String} name
      * @param {Object} data
      */
     sendToOther(target, name, data = undefined) {
         this.users.forEach((user, client) => {
-            if (user !== target) {
+            if (user !== target && target !== client) {
                 client.send(name, data);
             }
         });

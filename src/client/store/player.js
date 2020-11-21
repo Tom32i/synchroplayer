@@ -1,5 +1,6 @@
 const PLAYER_LOAD_FROM_FILE = 'PLAYER_LOAD_FROM_FILE';
 const PLAYER_LOAD_FROM_URL = 'PLAYER_LOAD_FROM_URL';
+const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
 const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
 const PLAYER_SET_DURATION = 'PLAYER_SET_DURATION';
 const PLAYER_READY = 'PLAYER_READY';
@@ -14,6 +15,10 @@ export function loadVideoFromUrl(url, name, size, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, size, type, source: 'url' } };
 }
 
+export function loadVideoFromServer(source, name, duration, url = null) {
+    return { type: PLAYER_LOAD_FROM_SERVER, payload: { source, name, duration, url } };
+}
+
 export function loadSubtitle(url) {
     return { type: PLAYER_LOAD_SUBTITLE, payload: { url } };
 }
@@ -22,8 +27,8 @@ export function setDuration(duration) {
     return { type: PLAYER_SET_DURATION, payload: { duration } };
 }
 
-export function setReady() {
-    return { type: PLAYER_READY };
+export function setReady(ready) {
+    return { type: PLAYER_READY, payload: { ready } };
 }
 
 export function play() {
@@ -43,6 +48,7 @@ const initialState = {
     subtitle: null,
     ready: false,
     playing: false,
+    fromServer: false,
 };
 
 export default function player(state = initialState, action) {
@@ -57,7 +63,8 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 size: payload.size,
                 source: payload.source,
-                ready: false
+                ready: false,
+                fromServer: false,
             };
 
         case PLAYER_LOAD_FROM_URL:
@@ -68,7 +75,18 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 size: payload.size,
                 source: payload.source,
-                ready: false
+                ready: false,
+                fromServer: false,
+            };
+
+        case PLAYER_LOAD_FROM_SERVER:
+            return {
+                ...state,
+                url: payload.url,
+                name: payload.name,
+                source: payload.source,
+                ready: false,
+                fromServer: true,
             };
 
         case PLAYER_SET_DURATION:
@@ -78,7 +96,7 @@ export default function player(state = initialState, action) {
             return { ...state, subtitle: payload.url };
 
         case PLAYER_READY:
-            return { ...state, ready: true };
+            return { ...state, ready: payload.ready };
 
         case PLAYER_PLAY:
             return { ...state, playing: true };

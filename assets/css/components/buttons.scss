@@ -1,0 +1,11 @@
+.action {
+    font-weight: bold;
+    border-radius: 4px;
+    background-color: darken($color-primary, 15%);
+    color: white;
+    padding: 0.6em 1em;
+
+    &:hover {
+        background-color: $color-primary;
+    }
+}

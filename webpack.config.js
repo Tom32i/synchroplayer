@@ -35,6 +35,12 @@ const clientConfig = {
           'sass-loader'
         ],
       },
+      {
+        test: /\.(svg|ttf|woff)$/,
+        use: [
+          'file-loader',
+        ],
+      },
     ]
   },
   resolve,

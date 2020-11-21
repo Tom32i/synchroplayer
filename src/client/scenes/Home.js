@@ -21,8 +21,8 @@ class Home extends Component {
     render() {
         return(
             <div className="home">
-                <h1>Synchroplayer</h1>
-                <p>Drop a video to start</p>
+                <h1 className="title">Synchroplayer</h1>
+                <p className="stater">Drop a video to start</p>
             </div>
         );
     }

@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 export default class Button extends Component {
     static propTypes = {
         label: PropTypes.node.isRequired,
-        onClick: PropTypes.func.isRequired,
-        className: PropTypes.string.isRequired,
+        className: PropTypes.string,
+        onClick: PropTypes.func,
     };
 
     static defaultProps = {
         className: '',
+        onClick: undefined,
     };
 
     render() {

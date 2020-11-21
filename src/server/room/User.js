@@ -1,10 +1,16 @@
-export default class User {
-    constructor(id) {
+import EventEmitter from 'tom32i-event-emitter.js';
+
+export default class User extends EventEmitter {
+    constructor(id, ready = false) {
+        super();
+
         this.id = id;
-        this.ready = false;
+        this.ready = ready;
     }
 
-    setReady() {
-        this.ready = true;
+    setReady(ready) {
+        this.ready = ready;
+
+        this.emit('ready', this);
     }
 }

@@ -6,6 +6,9 @@ export default class Api {
     constructor(host, protocol) {
         this.host = host;
         this.protocol = protocol;
+
+        this.play = this.play.bind(this);
+        this.pause = this.pause.bind(this);
     }
 
     addEventListener(name, callback) {
@@ -33,14 +36,20 @@ export default class Api {
     }
 
     play() {
-        this.client.send('me:control:play');
+        this.client.send('control:play');
     }
 
     pause() {
-        this.client.send('me:control:pause');
+        this.client.send('control:pause');
     }
 
-    ready() {
-        this.client.send('me:ready');
+    ready(ready) {
+        console.log('I\'m ready?', ready);
+        this.client.send('user:ready', { id: 0, ready });
+    }
+
+    loadVideo(source, name, duration, url) {
+        console.log('loadVideo', { source, name, duration, url });
+        this.client.send(`video:${source}`, { url, name, duration });
     }
 }

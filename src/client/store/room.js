@@ -27,8 +27,8 @@ export function userRemove(id) {
     return { type: ROOM_USER_REMOVE, payload: { id } };
 }
 
-export function userReady(id) {
-    return { type: ROOM_USER_READY, payload: { id } };
+export function userReady(payload) {
+    return { type: ROOM_USER_READY, payload };
 }
 
 // INITIAL STATES
@@ -55,10 +55,9 @@ function user(state = initialUserState, action) {
             return { ...state, id: payload.id };
 
         case ROOM_USER_READY:
-            console.log(payload.id !== state.id);
             if (payload.id !== state.id) { return state; }
 
-            return { ...state, ready: true };
+            return { ...state, ready: payload.ready };
 
         default:
             return state;
@@ -95,6 +94,7 @@ export default function room(state = initialState, action) {
             };
 
         case ROOM_USER_READY:
+            console.log(ROOM_USER_READY, payload);
             return {
                 ...state,
                 users: state.users.map(userState => user(userState, action)),

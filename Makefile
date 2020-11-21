@@ -25,4 +25,4 @@ start-demo:
 
 ## Lint
 lint:
-	npx eslint src/*  --fix
+	npx eslint src/* --ext .js,.json --fix
