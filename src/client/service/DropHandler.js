@@ -1,19 +1,22 @@
 import { loadVideoFromFile, loadVideoFromUrl, loadSubtitle, completeVideoFromFile } from '@client/store/player';
 import HeadRequest from '@client/http/HeadRequest';
 
-const TYPE_VIDEO_MATCHER = /^video/i;
 const EXTENTION_MATCHER = /\.(\w+)$/i;
 const URL_MATCHER = /^https?:\/\/.+\/([^/]+\.\w+)$/i;
 
 export default class DropHandler {
-    constructor(store) {
+    constructor(store, converter) {
         this.store = store;
+        this.converter = converter;
 
         this.onDragOver = this.onDragOver.bind(this);
         this.onDrop = this.onDrop.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.handleDrop = this.handleDrop.bind(this);
+        this.handleFile = this.handleFile.bind(this);
         this.handleText = this.handleText.bind(this);
+        this.handleVideo = this.handleVideo.bind(this);
+        this.handleSubtitle = this.handleSubtitle.bind(this);
     }
 
     start() {
@@ -21,6 +24,7 @@ export default class DropHandler {
         document.addEventListener('drop', this.onDrop);
         document.addEventListener('paste', this.onPaste);
     }
+
     onDragOver(event) {
         event.preventDefault();
     }
@@ -42,28 +46,38 @@ export default class DropHandler {
     handleDrop(item) {
         const { kind, type } = item;
 
-        if (kind === 'file') {
-            return this.handleFile(item.getAsFile());
+        switch (kind) {
+            case 'file':
+                this.handleFile(item.getAsFile());
+                break;
+
+            case 'string':
+                item.getAsString(this.handleText);
+                break;
+
+            default:
+                console.info(`Could not handle drop ${kind} ${type}`);
+                break;
         }
 
-        if (kind === 'string') {
-            return item.getAsString(this.handleText);
-        }
-
-        console.info(`Could not handle rop ${kind} ${type}`);
     }
 
     handleFile(file) {
-        const { name, type, size } = file;
+        const { name, type } = file;
 
-        if (type.match(TYPE_VIDEO_MATCHER)) {
-            const { player } = this.store.getState();
-            const isFileFromServer = player.source === 'file' && player.fromServer;
-            const action = isFileFromServer ? completeVideoFromFile : loadVideoFromFile;
+        switch (type) {
+            case 'video/webm':
+            case 'video/mp4':
+                this.handleVideo(file);
+                break;
 
-            return this.store.dispatch(
-                action(URL.createObjectURL(file), name, size, type)
-            );
+            case 'text/vtt':
+                this.handleSubtitle(file);
+                break;
+
+            case 'text/srt':
+                this.handleSrtSubtitle(file);
+                break;
         }
 
         const matches = name.match(EXTENTION_MATCHER);
@@ -71,12 +85,32 @@ export default class DropHandler {
         if (matches) {
             switch (matches[1]) {
                 case 'srt':
-                    return this.store.dispatch(loadSubtitle(URL.createObjectURL(file)));
+                    this.handleSrtSubtitle(file);
+                    break;
 
                 case 'vtt':
-                    return this.store.dispatch(loadSubtitle(URL.createObjectURL(file)));
+                    this.handleSubtitle(file);
+                    break;
             }
         }
+    }
+
+    handleVideo(file) {
+        const { player } = this.store.getState();
+        const isFileFromServer = player.source === 'file' && player.fromServer;
+        const action = isFileFromServer ? completeVideoFromFile : loadVideoFromFile;
+
+        this.store.dispatch(
+            action(URL.createObjectURL(file), file.name, file.size,file.type)
+        );
+    }
+
+    handleSubtitle(file) {
+        this.store.dispatch(loadSubtitle(URL.createObjectURL(file), file.name));
+    }
+
+    handleSrtSubtitle(file) {
+        this.converter.srtToVtt(file, this.handleSubtitle);
     }
 
     handleText(value) {

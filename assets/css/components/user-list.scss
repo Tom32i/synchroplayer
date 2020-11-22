@@ -5,6 +5,7 @@
     position: absolute;
     top: 0;
     font-size: 32px;
+    transition: transform 300ms;
 
     .user {
         display: flex;
@@ -36,4 +37,8 @@
             color: red;
         }
     }
+}
+
+.showtime .user-list {
+    transform: translateY(-100%);
 }

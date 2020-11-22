@@ -18,7 +18,7 @@ start-client:
 	php -S 0.0.0.0:8000 -t build
 
 start-server:
-	node build/server.js 8001
+	node bin/server.js 8001
 
 start-demo:
 	php -S 0.0.0.0:8002 -t demo

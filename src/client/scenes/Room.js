@@ -12,6 +12,7 @@ class Room extends Component {
         url: PropTypes.bool.isRequired,
         source: PropTypes.string,
         name: PropTypes.string,
+        showtime: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
@@ -34,10 +35,10 @@ class Room extends Component {
     }
 
     render(){
-        const { id } = this.props;
+        const { id, showtime } = this.props;
 
         return (
-            <div className="room">
+            <div className={`room ${showtime ? 'showtime' : ''}`}>
                 <Socket room={id} />
                 {this.renderContent()}
                 <UserList />
@@ -51,5 +52,6 @@ export default connect(
         source: state.player.source,
         url: state.player.url !== null,
         name: state.player.name,
+        showtime: state.player.showtime,
     })
 )(Room);

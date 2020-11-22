@@ -2,25 +2,23 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
+import { setShowtime } from '@client/store/player';
 import Video from '@client/components/Video';
-import Subtitle from '@client/components/Subtitle';
 import Controls from '@client/components/Controls';
 import Timeline from '@client/components/Timeline';
 import AuthorizationModal from '@client/components/AuthorizationModal';
+import Showtime from '@client/common/Showtime';
 
 class Player extends Component {
     static propTypes = {
-        subtitle: PropTypes.string,
-    };
-
-    static defaultProps = {
-        subtitle: null,
+        setShowtime: PropTypes.func.isRequired,
     };
 
     constructor(props) {
         super(props);
 
         this.api = get('api');
+        this.showtime = new Showtime(props.setShowtime);
         this.video = null;
         this.timeline = null;
 
@@ -75,16 +73,19 @@ class Player extends Component {
         this.api.seek(Math.min(this.video.currentTime + 10, this.video.duration));
     }
 
-    render(){
-        const { subtitle } = this.props;
+    render() {
+        const { onPlayed, onPaused, onUIEnter, onUILeave } = this.showtime;
 
         return (
             <figure className="player">
                 <AuthorizationModal />
-                <Video ref={this.setVideo} onTimeUpdate={this.onTimeUpdate}>
-                    {subtitle ? <Subtitle src={subtitle} /> : null}
-                </Video>
-                <div className="player-bottom-bar">
+                <Video
+                    ref={this.setVideo}
+                    onTimeUpdate={this.onTimeUpdate}
+                    onPlayed={onPlayed}
+                    onPaused={onPaused}
+                />
+                <div className="player-bottom-bar" onMouseEnter={onUIEnter} onMouseLeave={onUILeave}>
                     <Timeline ref={this.setTimeline} onSeek={this.onSeek} />
                     <Controls
                         onStop={this.onStop}
@@ -100,7 +101,8 @@ class Player extends Component {
 }
 
 export default connect(
-    state => ({
-        subtitle: state.player.subtitle,
+    null,
+    dispatch => ({
+        setShowtime: showtime => dispatch(setShowtime(showtime)),
     })
 )(Player);

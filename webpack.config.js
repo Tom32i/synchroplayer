@@ -54,7 +54,7 @@ const serverConfig = {
   entry: './src/server/index.js',
   output: {
     filename: 'server.js',
-    path: `${__dirname}/build`,
+    path: `${__dirname}/bin`,
   },
   module: {
     rules: [

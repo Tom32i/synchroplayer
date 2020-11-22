@@ -10,6 +10,7 @@ const PLAYER_PLAY = 'PLAYER_PLAY';
 const PLAYER_PAUSE = 'PLAYER_PAUSE';
 const PLAYER_SEEK = 'PLAYER_SEEK';
 const PLAYER_STOP = 'PLAYER_STOP';
+const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
 
 export function loadVideoFromFile(url, name, size, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, size, type, source: 'file' } };
@@ -27,8 +28,8 @@ export function completeVideoFromFile(url, name, size, type = null) {
     return { type: PLAYER_COMPLETE_FROM_FILE, payload: { url, name, size, type } };
 }
 
-export function loadSubtitle(url) {
-    return { type: PLAYER_LOAD_SUBTITLE, payload: { url } };
+export function loadSubtitle(url, label) {
+    return { type: PLAYER_LOAD_SUBTITLE, payload: { url, label } };
 }
 
 export function setDuration(duration) {
@@ -59,6 +60,10 @@ export function stop() {
     return { type: PLAYER_STOP };
 }
 
+export function setShowtime(active) {
+    return { type: PLAYER_SHOWTIME, payload: { active } };
+}
+
 const initialState = {
     url: null,
     source: null,
@@ -66,12 +71,37 @@ const initialState = {
     name: null,
     duration: null,
     subtitle: null,
+    subtitles: [],
     loaded: false,
     authorized: true,
     playing: false,
     fromServer: false,
     time: 0,
+    showtime: false,
 };
+
+const inititalSubtitleState = {
+    url: null,
+    label: null,
+};
+
+// REDUCERS
+
+function subtitle(state = inititalSubtitleState, action) {
+    const { type, payload } = action;
+
+    switch (type) {
+        case PLAYER_LOAD_SUBTITLE:
+            return {
+                ...state,
+                url: payload.url,
+                label: payload.label,
+            };
+
+        default:
+            return state;
+    }
+}
 
 export default function player(state = initialState, action) {
     const { type, payload } = action;
@@ -125,7 +155,7 @@ export default function player(state = initialState, action) {
             return { ...state, duration: payload.duration };
 
         case PLAYER_LOAD_SUBTITLE:
-            return { ...state, subtitle: payload.url };
+            return { ...state, subtitles: state.subtitles.concat([ subtitle(undefined, action) ]) };
 
         case PLAYER_LOADED:
             return { ...state, loaded: payload.loaded };
@@ -144,6 +174,9 @@ export default function player(state = initialState, action) {
 
         case PLAYER_STOP:
             return { ...state, playing: false, time: 0 };
+
+        case PLAYER_SHOWTIME:
+            return { ...state, showtime: payload.active };
 
         default:
             return state;

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { setLoaded, setAuthorized, setDuration } from '@client/store/player';
+import Subtitles from '@client/components/Subtitles';
 
 class Video extends Component {
     static propTypes = {
@@ -14,13 +15,13 @@ class Video extends Component {
         setLoaded: PropTypes.func.isRequired,
         setAuthorized: PropTypes.func.isRequired,
         onTimeUpdate: PropTypes.func.isRequired,
+        onPlayed: PropTypes.func.isRequired,
+        onPaused: PropTypes.func.isRequired,
         preload: PropTypes.string,
-        children: PropTypes.node,
     };
 
     static defaultProps = {
         preload: 'auto',
-        children: null,
     };
 
     constructor(props) {
@@ -122,7 +123,7 @@ class Video extends Component {
     }
 
     render(){
-        const { src, preload, children } = this.props;
+        const { src, preload } = this.props;
 
         return (
             <video
@@ -131,10 +132,12 @@ class Video extends Component {
                 preload={preload}
                 onLoadStart={this.onLoadStart}
                 onCanPlay={this.onCanPlay}
-                onTimeUpdate={this.props.onTimeUpdate}
                 onDurationChange={this.onDurationChange}
+                onTimeUpdate={this.props.onTimeUpdate}
+                onPlay={this.props.onPlayed}
+                onPause={this.props.onPaused}
             >
-                {children}
+                <Subtitles />
             </video>
         );
     }
