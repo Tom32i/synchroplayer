@@ -1,0 +1,11 @@
+---
+
+- name: task/shell
+  block:
+
+    - name: task/shell > "{{ item.options }}"
+      shell: >
+        {{ item.options }}
+      args:
+        chdir: "{{ release_dir }}"
+      tags: log

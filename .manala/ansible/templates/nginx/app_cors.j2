@@ -1,0 +1,8 @@
+add_header Access-Control-Allow-Origin "*" always;
+add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
+add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept-Encoding, Cache-Control" always;
+add_header Access-Control-Allow-Credentials "true" always;
+add_header Access-Control-Expose-Headers "Content-Disposition";
+if ($request_method = OPTIONS) {
+    return 204;
+}

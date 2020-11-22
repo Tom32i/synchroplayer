@@ -1,0 +1,5 @@
+---
+
+- hosts: system
+  roles:
+    - system

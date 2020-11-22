@@ -1,0 +1,53 @@
+#!/bin/sh
+
+{% if item.message is iterable and item.message is not string -%}
+MESSAGE="$(printf '%s\n' {% for message in item.message %}{{ message | center(80) | quote }} {% endfor %}| shuf -n1)"
+{% else -%}
+MESSAGE={{ item.message | center(80) | quote }}
+{% endif %}
+
+MOTD=$(cat <<EOF
+                                                                                      [0m
+[1;31m                   eeeeeeee                                                     [0m
+[1;31m                   eeeeeeee                                                     [0m
+[1;31m                   eeeeeeee                                                     [0m
+[1;31m     eeeeeee       eeeeeeee     eeeeeeee  eeeeee      eeeeeeeeeee               [0m
+[1;31m  eeeeeeeeeeee     eeeeeeee   eeeeeeeeeeeeeeeeee    eeeeeeeeeeeeeee             [0m
+[1;31m eeeeeeeeeeeeeee   eeeeeeee  eeeeeeeeeeeeeeeeeee   eeeeeeeeeeeeeeeee            [0m
+[1;31meeeee       eeeee  eeeeeeee  eeeeeee     eeeeeee  eeeeeee     eeeeeee           [0m
+[1;31meeeeeeeeeeeeeeeee  eeeeeeee  eeeeee       eeeeee  eeeeee       eeeeee           [0m
+[1;31meeeeeeeeeeeeeeeee  eeeeeeee  eeeeee       eeeeee  eeeeee       eeeeee           [0m
+[1;31meeeee              eeeeeeee  eeeeeee     eeeeeee  eeeeeee     eeeeeee           [0m
+[1;31meeeee      eeeeee  eeeeeeee  eeeeeeeeeeeeeeeeeee   eeeeeeeeeeeeeeeee            [0m
+[1;31m eeeeeeeeeeeeeee   eeeeeeee   eeeeeeeeeeeeeeeeee    eeeeeeeeeeeeeee             [0m
+[1;31m   eeeeeeeeeee     eeeeeeee     eeeeeeee  eeeeee      eeeeeeeeeee    [1;31m[5m///////////[0m
+
+$MESSAGE
+EOF
+)
+
+MOTD_APRIL_FOOL=$(cat <<EOF
+                                                        [1;36m                              [0m
+[1;31m                   eeeeeeee                       [1;36m                              [0m
+[1;31m                   eeeeeeee                       [1;36m                   @          [0m
+[1;31m                   eeeeeeee                       [1;36m                              [0m
+[1;31m     eeeeeee       eeeeeeee     eeeeeeee  eeeeee  [1;36m                              [0m
+[1;31m  eeeeeeeeeeee     eeeeeeee   eeeeeeeeeeeeeeeeee  [1;36m               @              [0m
+[1;31m eeeeeeeeeeeeeee   eeeeeeee  eeeeeeeeeeeeeeeeeee  [1;36m                    @         [0m
+[1;31meeeee       eeeee  eeeeeeee  eeeeeee     eeeeeee  [1;34me        eeeeee               [0m
+[1;31meeeeeeeeeeeeeeeee  eeeeeeee  eeeeee       eeeeee  [1;34mee   eeeeeeeeeeee             [0m
+[1;31meeeeeeeeeeeeeeeee  eeeeeeee  eeeeee       eeeeee  [1;34meeeeeeeeeee  eeeee            [0m
+[1;31meeeee              eeeeeeee  eeeeeee     eeeeeee  [1;34meeeeeeeeeeeeeeeeee            [0m
+[1;31meeeee      eeeeee  eeeeeeee  eeeeeeeeeeeeeeeeeee  [1;34mee   eeeeeeeeeeee             [0m
+[1;31m eeeeeeeeeeeeeee   eeeeeeee   eeeeeeeeeeeeeeeeee  [1;34me        eeeeee               [0m
+[1;31m   eeeeeeeeeee     eeeeeeee     eeeeeeee  eeeeee  [1;34m                   [1;31m[5m///////////[0m
+
+                                   Gloup gloup
+EOF
+)
+
+if [ "$(date '+%m%d')" = "0401" ]; then
+	MOTD=${MOTD_APRIL_FOOL}
+fi
+
+printf "%s\n" "$MOTD"

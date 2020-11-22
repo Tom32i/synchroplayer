@@ -1,0 +1,31 @@
+---
+
+- name: strategy/git
+  block:
+
+    - name: strategy/git > Repository
+      git:
+        repo:           "{{ deploy_strategy_git_repo }}"
+        dest:           "{{ deploy_dir ~ '/repo' }}"
+        version:        "{{ deploy_strategy_git_ref }}"
+        accept_hostkey: true
+        update:         true
+
+    - name: strategy/git > Get head
+      shell: >
+        git rev-parse --short HEAD
+      args:
+        chdir: "{{ deploy_dir ~ '/repo' }}"
+      tags: log_failed
+      register: __deploy_strategy_git_head_result
+
+    - name: strategy/git > Set head
+      set_fact:
+        deploy_strategy_git_head: "{{ __deploy_strategy_git_head_result.stdout }}"
+
+    - name: strategy/git > Export repository
+      shell: >
+        git checkout-index -f -a --prefix="{{ deploy_helper.new_release_path }}/"
+      args:
+        chdir: "{{ deploy_dir ~ '/repo' }}"
+      tags: log_failed

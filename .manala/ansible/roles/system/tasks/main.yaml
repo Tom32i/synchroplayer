@@ -1,0 +1,187 @@
+---
+
+# Accounts
+- import_role:
+      name: accounts
+  when: manala_accounts_enabled
+  tags: [accounts]
+
+# Motd
+- import_role:
+      name: motd
+  when: manala_motd_enabled
+  tags: [motd]
+
+# Timezone
+- import_role:
+      name: timezone
+  when: manala_timezone_enabled
+  tags: [timezone]
+
+# Locales
+- import_role:
+      name: locales
+  when: manala_locales_enabled
+  tags: [locales]
+
+# Zsh
+- import_role:
+      name: zsh
+  when: manala_zsh_enabled
+  tags: [zsh]
+
+# Environment
+- import_role:
+      name: environment
+  when: manala_environment_enabled
+  tags: [env]
+
+# Apt
+- import_role:
+      name: apt
+  when: manala_apt_enabled
+  tags: [apt]
+
+# Ssh
+- import_role:
+      name: ssh
+  when: manala_ssh_enabled
+  tags: [ssh]
+
+# Git
+- import_role:
+      name: git
+  when: manala_git_enabled
+  tags: [git]
+
+# Oh my zsh
+- import_role:
+      name: ohmyzsh
+  when: manala_ohmyzsh_enabled
+  tags: [ohmyzsh]
+
+# Vim
+- import_role:
+      name: vim
+  when: manala_vim_enabled
+  tags: [vim]
+
+# Alternatives
+- import_role:
+      name: alternatives
+  when: manala_alternatives_enabled
+  tags: [alternatives]
+
+# Files
+- import_role:
+      name: files
+  when: manala_files_enabled
+  tags: [files]
+
+# NodeJS
+- import_role:
+      name: nodejs
+  when: manala_nodejs_enabled
+  tags: [nodejs, node]
+
+# Npm
+- import_role:
+      name: npm
+  when: manala_npm_enabled
+  tags: [npm, node]
+
+# Yarn
+- import_role:
+      name: yarn
+  when: manala_yarn_enabled
+  tags: [yarn, node]
+
+# Php
+- import_role:
+      name: php
+  when: manala_php_enabled
+  tags: [php, env]
+
+# Composer
+- import_role:
+      name: composer
+  when: manala_composer_enabled
+  tags: [composer]
+
+# Symfony Cli
+- import_role:
+      name: symfony_cli
+  when: manala_symfony_cli_enabled
+  tags: [symfony]
+
+# Nginx
+- import_role:
+      name: nginx
+  when: manala_nginx_enabled
+  tags: [nginx]
+
+# Supervisor
+- import_role:
+      name: supervisor
+  when: manala_supervisor_enabled
+  tags: [supervisor]
+
+# Ngrok
+- import_role:
+      name: ngrok
+  when: manala_ngrok_enabled
+  tags: [ngrok]
+
+# Java
+- import_role:
+      name: java
+  when: manala_java_enabled
+  tags: [java]
+
+# Cron
+- import_role:
+      name: cron
+  when: manala_cron_enabled
+  tags: [cron]
+
+# MySQL / MariaDB
+- import_role:
+      name: mysql
+  when: manala_mysql_enabled
+  tags: [mysql, mariadb]
+
+# Redis
+- import_role:
+      name: redis
+  when: manala_redis_enabled
+  tags: [redis]
+
+# Elasticsearch
+- import_role:
+      name: elasticsearch
+  when: manala_elasticsearch_enabled
+  tags: [elasticsearch]
+
+# InfluxDB
+- import_role:
+      name: influxdb
+  when: manala_influxdb_enabled
+  tags: [influxdb]
+
+# MongoDB
+- import_role:
+      name: mongodb
+  when: manala_mongodb_enabled
+  tags: [mongodb]
+
+# Docker
+- import_role:
+      name: docker
+  when: manala_docker_enabled
+  tags: [docker]
+
+# Gomplate
+- import_role:
+      name: gomplate
+  when: manala_gomplate_enabled
+  tags: [gomplate]

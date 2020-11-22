@@ -1,0 +1,36 @@
+{%- set config = item.config|default('') -%}
+
+{%- if config -%}
+
+{{ config }}
+
+{%- else -%}
+
+{%- set groups = item.groups|default({}) -%}
+
+{% for group, parameters in groups|dictsort %}
+[group:{{ group }}]
+{{- {
+  'programs': parameters.programs|mandatory,
+} | combine(parameters) | manala.roles.supervisor_config_parameters }}
+
+{% endfor %}
+
+{%- set programs = item.programs|default({}) -%}
+
+{% for program, parameters in programs|dictsort %}
+[program:{{ program }}]
+{{- {
+  'command': parameters.command|mandatory,
+  'autostart': false,
+  'startretries': 20,
+  'autorestart': true,
+  'user': 'vagrant',
+  'redirect_stderr': true,
+  'stdout_logfile_maxbytes': 0,
+  'stderr_logfile_maxbytes': 0,
+} | combine(parameters) | manala.roles.supervisor_config_parameters }}
+
+{% endfor %}
+
+{%- endif -%}

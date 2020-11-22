@@ -5,9 +5,10 @@ const EXTENTION_MATCHER = /\.(\w+)$/i;
 const URL_MATCHER = /^https?:\/\/.+\/([^/]+\.\w+)$/i;
 
 export default class DropHandler {
-    constructor(store, converter) {
+    constructor(store, converter, youtube) {
         this.store = store;
         this.converter = converter;
+        this.youtube = youtube;
 
         this.onDragOver = this.onDragOver.bind(this);
         this.onDrop = this.onDrop.bind(this);
@@ -23,6 +24,8 @@ export default class DropHandler {
         document.addEventListener('dragover', this.onDragOver);
         document.addEventListener('drop', this.onDrop);
         document.addEventListener('paste', this.onPaste);
+
+        this.handleText('https://youtu.be/BathEBfiG1s');
     }
 
     onDragOver(event) {
@@ -39,7 +42,7 @@ export default class DropHandler {
 
     onPaste(event) {
         this.handleText(
-            (event.clipboardData || window.clipboardData).getData('text')
+            (event.clipboardData || window.clipboardData).getData('text').trim()
         );
     }
 
@@ -114,7 +117,23 @@ export default class DropHandler {
     }
 
     handleText(value) {
-        const matches = value.trim().match(URL_MATCHER);
+        const id = this.youtube.getVideoId(value);
+
+        if (id) {
+            this.youtube.getVideoInfo(value);
+
+            return;
+
+            /* const url = value.replace(...YOUTUBE_MATCHER);
+
+            return this.store.dispatch(
+                loadVideoFromUrl(url, 'youtube video')
+            );*/
+        }
+
+        console.log('not matched');
+
+        const matches = value.match(URL_MATCHER);
 
         if (matches) {
             const [url, name] = matches;

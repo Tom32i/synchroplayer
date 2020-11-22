@@ -1,0 +1,21 @@
+#!/usr/bin/env groovy
+
+podTemplate(
+    inheritFrom: 'integration',
+    label: 'integration-app',
+    containers: [
+        containerTemplate(
+            name: 'debug',
+            image: 'debian:10-slim',
+            alwaysPullImage: false,
+            ttyEnabled: true,
+            command: 'cat'
+        ),
+    ]
+) {
+    node('integration-app') {
+        stage('¯\\_(ツ)_/¯') {
+            echo 'Because testing is doubting...'
+        }
+    }
+}

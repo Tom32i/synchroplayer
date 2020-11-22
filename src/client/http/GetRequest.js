@@ -1,19 +1,17 @@
 /**
- * Head HTTP Request
+ * HTTP GET Request
  */
-export default class HeadRequest {
+export default class GetRequest {
     /**
    * Constructor
    *
    * @param {String} url
-   * @param {Array} headers
    * @param {Function} success
    * @param {Function} error
    * @param {Bool} withCredentials
    */
-    constructor(url, headers, success, error, withCredentials = false) {
+    constructor(url, success, error, withCredentials = false) {
         this.url = url;
-        this.headers = headers;
         this.success = success;
         this.error = error;
         this.request = new XMLHttpRequest();
@@ -23,7 +21,7 @@ export default class HeadRequest {
 
         this.request.addEventListener('readystatechange', this.onReadyStateChange);
         this.request.addEventListener('error', this.onError);
-        this.request.open('HEAD', this.url, true);
+        this.request.open('GET', this.url, true);
         this.request.withCredentials = withCredentials;
         this.request.send();
     }
@@ -41,37 +39,33 @@ export default class HeadRequest {
         }
     }
 
-    /**
-   * On response
-   */
     onResponse() {
-        const headers = this.headers.map(name => this.request.getResponseHeader(name));
-        console.log(this.request.getAllResponseHeaders());
-        return this.onSuccess(headers);
+        let content;
+
+        try {
+            content = this.getContent();
+        } catch (error) {
+            return this.onError(error);
+        }
+
+        this.onSuccess(content);
     }
 
-    /**
-   * On success
-   *
-   * @param {Object} data
-   */
-    onSuccess(data) {
+    onSuccess(content) {
         this.clear();
-        this.success(data);
+        this.success(content);
     }
 
-    /**
-   * On Error
-   */
-    onError() {
+    onError(error) {
         const message = `Request to "${this.url}" failed with status "${this.request.status}".`;
         this.clear();
         this.error(new Error(message));
     }
 
-    /**
-   * Clear the request
-   */
+    getContent() {
+        return this.request.responseText;
+    }
+
     clear() {
         this.request.removeEventListener('readystatechange', this.onReadyStateChange);
         this.request.removeEventListener('error', this.onError);
