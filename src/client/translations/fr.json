@@ -5,5 +5,9 @@
             "content": "Sur ce navigateur, Syncroplayer a besoin de votre autorisation pour lancer la video.",
             "ok": "Accepter"
         }
+    },
+    "room": {
+        "drop_to_start": "Déposer une vidéo ou un lien pour commencer",
+        "drop_file": "Déposer le fichier \"{{name}}\" pour commencer"
     }
 }

@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { setLoaded, setAuthorized, setDuration } from '@client/store/player';
 
-export default class Video extends Component {
+class Video extends Component {
     static propTypes = {
         src: PropTypes.string.isRequired,
-        onCanPlay: PropTypes.func,
-        onLoadedMetadata: PropTypes.func,
-        onAuthorized: PropTypes.func.isRequired,
-        onNotAuthorized: PropTypes.func.isRequired,
+        playing: PropTypes.bool.isRequired,
+        time: PropTypes.number.isRequired,
+        authorized: PropTypes.bool.isRequired,
+        loaded: PropTypes.bool.isRequired,
+        setDuration: PropTypes.func.isRequired,
+        setLoaded: PropTypes.func.isRequired,
+        setAuthorized: PropTypes.func.isRequired,
         onTimeUpdate: PropTypes.func.isRequired,
-        onDurationChange: PropTypes.func.isRequired,
         preload: PropTypes.string,
         children: PropTypes.node,
     };
 
     static defaultProps = {
-        onCanPlay: null,
-        onLoadedMetadata: null,
         preload: 'auto',
         children: null,
     };
@@ -25,36 +27,51 @@ export default class Video extends Component {
         super(props);
 
         this.element = null;
+        this.ready = false;
 
         this.setElement = this.setElement.bind(this);
         this.play = this.play.bind(this);
+        this.onLoadStart = this.onLoadStart.bind(this);
+        this.onCanPlay = this.onCanPlay.bind(this);
+        this.onDurationChange = this.onDurationChange.bind(this);
+        this.onNotAuthorized = this.onNotAuthorized.bind(this);
+        this.onAuthorized = this.onAuthorized.bind(this);
         this.onError = this.onError.bind(this);
     }
 
-    get duration() { return this.element.duration; }
     get currentTime() { return this.element.currentTime; }
-    set currentTime(value) { this.element.currentTime = value; }
-    get currentSrc() { return this.element.currentSrc; }
+    get duration() { return this.element.duration; }
+    get seekMin() { return this.element.seekable.start(0); }
+    get seekMax() { return this.element.seekable.end(0); }
+
+    componentDidUpdate(prevProps) {
+        const { time, playing } = this.props;
+
+        if (playing !== prevProps.playing) {
+            this.seek(time);
+            playing ? this.play() : this.pause();
+        } else if (time !== prevProps.time) {
+            this.seek(time);
+        }
+    }
 
     setElement(element) {
         this.element = element;
     }
 
     play() {
-        const { onAuthorized, onNotAuthorized } = this.props;
-
         let promise = null;
 
         try {
             promise = this.element.play();
         } catch (error) {
-            onNotAuthorized(error);
+            this.onNotAuthorized(error);
         }
 
         if (promise) {
-            promise.then(onAuthorized).catch(onNotAuthorized);
+            promise.then(this.onAuthorized).catch(this.onNotAuthorized);
         } else {
-            onAuthorized();
+            this.onAuthorized();
         }
     }
 
@@ -62,30 +79,80 @@ export default class Video extends Component {
         this.element.pause();
     }
 
-    /**
-     * Video load error
-     *
-     * @param {Error} error
-     */
+    seek(time) {
+        if (typeof time === 'number') {
+            this.element.currentTime = time;
+        }
+    }
+
+    onAuthorized() {
+        if (!this.props.authorized) {
+            this.props.setAuthorized(true);
+        }
+    }
+
+    onNotAuthorized(error) {
+        if (error instanceof DOMException && error.name === 'NotAllowedError' && this.props.authorized) {
+            this.props.setAuthorized(false);
+        }
+    }
+
+    onLoadStart() {
+        if (this.props.loaded) {
+            this.props.setLoaded(false);
+        }
+    }
+
+    onCanPlay() {
+        if (!this.props.loaded) {
+            this.props.setLoaded(true);
+
+            if (this.props.time > this.element.currentTime) {
+                this.seek(this.props.time);
+            }
+        }
+    }
+
+    onDurationChange() {
+        this.props.setDuration(this.element.duration);
+    }
+
     onError(error) {
         console.error(error);
     }
 
     render(){
-        const { src, onCanPlay, onLoadedMetadata, onTimeUpdate, onDurationChange, preload, children } = this.props;
+        const { src, preload, children } = this.props;
 
         return (
             <video
                 ref={this.setElement}
                 src={src}
-                onCanPlay={onCanPlay}
-                onLoadedMetadata={onLoadedMetadata}
-                onTimeUpdate={onTimeUpdate}
-                onDurationChange={onDurationChange}
                 preload={preload}
+                onLoadStart={this.onLoadStart}
+                onCanPlay={this.onCanPlay}
+                onTimeUpdate={this.props.onTimeUpdate}
+                onDurationChange={this.onDurationChange}
             >
                 {children}
             </video>
         );
     }
 }
+
+export default connect(
+    state => ({
+        src: state.player.url,
+        playing: state.player.playing,
+        time: state.player.time,
+        authorized: state.player.authorized,
+        loaded: state.player.loaded,
+    }),
+    dispatch => ({
+        setDuration: duration => dispatch(setDuration(duration)),
+        setLoaded: authorized => dispatch(setLoaded(authorized)),
+        setAuthorized: loaded => dispatch(setAuthorized(loaded)),
+    }),
+    null,
+    { forwardRef: true }
+)(Video);

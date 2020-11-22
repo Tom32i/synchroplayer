@@ -8,28 +8,59 @@ export default class Video extends EventEmitter {
         this.url = url;
         this.name = name;
         this.duration = duration;
-        this.playing = false;
-        this.time = 0;
+        this.playedAt = null;
+        this.at = null;
+        this.currentTime = 0;
     }
 
-    play() {
-        this.setPlaying(true);
+    get playing() {
+        return this.playedAt !== null;
     }
 
-    pause() {
-        this.setPlaying(false);
+    get time() {
+        if (this.playing) {
+            return this.currentTime + (Date.now() - this.playedAt) / 1000;
+        }
+
+        return this.currentTime;
     }
 
-    setPlaying(playing) {
-        if (playing !== this.playing) {
-            this.playing = playing;
-            this.emit('playing', playing);
+    play(time = this.time) {
+        if (!this.playing) {
+            this.playedAt = Date.now();
+            this.currentTime = time;
+            this.emit('play', time);
+            console.warn('Video playing:', time);
         }
     }
 
-    setTime(time) {
-        this.time = time;
+    pause(time = this.time) {
+        if (this.playing) {
+            this.playedAt = null;
+            this.currentTime = time;
+            this.emit('pause', time);
+            console.warn('Video paused:', time);
+        }
+    }
 
-        this.emit('time', time);
+    stop() {
+        if (this.playing || this.currentTime > 0) {
+            this.playedAt = null;
+            this.currentTime = 0;
+            this.emit('stop');
+            console.warn('Video stopped.');
+        }
+    }
+
+    seek(time) {
+        if (time !== this.currentTime) {
+            if (this.playing) {
+                this.playedAt = Date.now();
+            }
+
+            this.currentTime = time;
+            this.emit('seek', time);
+            console.warn('Video seeked:', time);
+        }
     }
 }

@@ -12,10 +12,15 @@ export default class Room {
         this.onClientReady = this.onClientReady.bind(this);
         this.onClientPlay = this.onClientPlay.bind(this);
         this.onClientPause = this.onClientPause.bind(this);
+        this.onClientStop = this.onClientStop.bind(this);
+        this.onClientSeek = this.onClientSeek.bind(this);
         this.onClientVideoFile = this.onClientVideoFile.bind(this);
         this.onClientVideoUrl = this.onClientVideoUrl.bind(this);
         this.onUserReady = this.onUserReady.bind(this);
-        this.onVideoPlaying = this.onVideoPlaying.bind(this);
+        this.onVideoPlay = this.onVideoPlay.bind(this);
+        this.onVideoPause = this.onVideoPause.bind(this);
+        this.onVideoSeek = this.onVideoSeek.bind(this);
+        this.onVideoStop = this.onVideoStop.bind(this);
     }
 
     addClient(client) {
@@ -25,6 +30,8 @@ export default class Room {
         client.on('user:ready', this.onClientReady);
         client.on('control:play', this.onClientPlay);
         client.on('control:pause', this.onClientPause);
+        client.on('control:stop', this.onClientStop);
+        client.on('control:seek', this.onClientSeek);
         client.on('video:file', this.onClientVideoFile);
         client.on('video:url', this.onClientVideoUrl);
     }
@@ -36,6 +43,8 @@ export default class Room {
         client.off('user:ready', this.onClientReady);
         client.off('control:play', this.onClientPlay);
         client.off('control:pause', this.onClientPause);
+        client.off('control:stop', this.onClientStop);
+        client.off('control:seek', this.onClientSeek);
         client.off('video:file', this.onClientVideoFile);
         client.off('video:url', this.onClientVideoUrl);
     }
@@ -81,6 +90,7 @@ export default class Room {
             const { source, url, name, duration } = this.video;
 
             client.send(`video:${source}`, { url, name, duration });
+            client.send('control:seek', this.video.currentTime);
         }
     }
 
@@ -88,16 +98,28 @@ export default class Room {
         this.users.get(client).setReady(data.ready);
     }
 
-    onClientPlay() {
+    onClientPlay(time) {
         if (!this.video) { return; }
 
-        this.video.play();
+        this.video.play(time);
     }
 
-    onClientPause() {
+    onClientPause(time) {
         if (!this.video) { return; }
 
-        this.video.pause();
+        this.video.pause(time);
+    }
+
+    onClientStop() {
+        if (!this.video) { return; }
+
+        this.video.stop();
+    }
+
+    onClientSeek(time) {
+        if (!this.video) { return; }
+
+        this.video.seek(time);
     }
 
     onClientVideoFile(data, client) {
@@ -111,10 +133,16 @@ export default class Room {
     setVideo(video, client) {
         if (this.video) {
             console.warn('Video already set');
-            this.video.off('playing', this.onVideoPlaying);
+            this.video.off('play', this.onVideoPlay);
+            this.video.off('pause', this.onVideoPause);
+            this.video.off('seek', this.onVideoSeek);
+            this.video.off('stop', this.onVideoStop);
         }
 
-        video.on('playing', this.onVideoPlaying);
+        video.on('play', this.onVideoPlay);
+        video.on('pause', this.onVideoPause);
+        video.on('seek', this.onVideoSeek);
+        video.on('stop', this.onVideoStop);
 
         const { source, url, name, duration } = video;
 
@@ -135,14 +163,20 @@ export default class Room {
         }
     }
 
-    onVideoPlaying() {
-        if (this.video.playing) {
-            this.send('control:play');
-            console.warn('Video playing.');
-        } else {
-            this.send('control:pause');
-            console.warn('Video paused.');
-        }
+    onVideoPlay() {
+        this.send('control:play', this.video.time);
+    }
+
+    onVideoPause() {
+        this.send('control:pause', this.video.time);
+    }
+
+    onVideoSeek() {
+        this.send('control:seek', this.video.time);
+    }
+
+    onVideoStop() {
+        this.send('control:stop');
     }
 
     /**

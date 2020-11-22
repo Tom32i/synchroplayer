@@ -35,15 +35,23 @@ export default class Api {
         this.client = null;
     }
 
-    play() {
-        this.client.send('control:play');
+    play(time) {
+        this.client.send('control:play', time);
     }
 
-    pause() {
-        this.client.send('control:pause');
+    pause(time) {
+        this.client.send('control:pause', time);
     }
 
-    ready(ready) {
+    stop() {
+        this.client.send('control:stop');
+    }
+
+    seek(time) {
+        this.client.send('control:seek', time);
+    }
+
+    setReady(ready) {
         this.client.send('user:ready', { id: 0, ready });
     }
 

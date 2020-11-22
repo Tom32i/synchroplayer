@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { get } from '@client/container';
 import { socketOpen, socketClose, me, userAdd, userRemove, userReady } from '@client/store/room';
 import { loadVideoFromServer } from '@client/store/player';
-import { play, pause } from '@client/store/player';
+import { play, pause, seek, stop } from '@client/store/player';
 
 class Socket extends Component {
     static propTypes = {
@@ -26,6 +26,8 @@ class Socket extends Component {
         onUserReady: PropTypes.func.isRequired,
         onControlPlay: PropTypes.func.isRequired,
         onControlPause: PropTypes.func.isRequired,
+        onControlSeek: PropTypes.func.isRequired,
+        onControlStop: PropTypes.func.isRequired,
         onVideo: PropTypes.func.isRequired,
     };
 
@@ -58,6 +60,8 @@ class Socket extends Component {
         this.api.addEventListener('user:ready', this.props.onUserReady);
         this.api.addEventListener('control:play', this.props.onControlPlay);
         this.api.addEventListener('control:pause', this.props.onControlPause);
+        this.api.addEventListener('control:stop', this.props.onControlStop);
+        this.api.addEventListener('control:seek', this.props.onControlSeek);
         this.api.addEventListener('video:file', this.onVideoFile);
         this.api.addEventListener('video:url', this.onVideoUrl);
     }
@@ -75,6 +79,8 @@ class Socket extends Component {
         this.api.removeEventListener('user:ready', this.props.onUserReady);
         this.api.removeEventListener('control:play', this.props.onControlPlay);
         this.api.removeEventListener('control:pause', this.props.onControlPause);
+        this.api.removeEventListener('control:stop', this.props.onControlStop);
+        this.api.removeEventListener('control:seek', this.props.onControlSeek);
         this.api.removeEventListener('video:file', this.onVideoFile);
         this.api.removeEventListener('video:url', this.onVideoUrl);
 
@@ -87,7 +93,7 @@ class Socket extends Component {
         const { ready, video } = this.props;
 
         if (ready !== prevProps.ready) {
-            this.api.ready(ready);
+            this.api.setReady(ready);
         }
 
         if (video && (!prevProps.video || video.url !== prevProps.video.url) && !video.fromServer) {
@@ -125,10 +131,10 @@ class Socket extends Component {
 
 export default connect(
     state => {
-        const { ready, url, source, name, duration, fromServer } = state.player;
+        const { loaded, authorized, url, source, name, duration, fromServer } = state.player;
 
         return {
-            ready,
+            ready: loaded && authorized,
             video: url && source && name && duration ? { url, source, name, duration, fromServer } : null,
         };
     },
@@ -141,6 +147,8 @@ export default connect(
         onUserReady: event => dispatch(userReady(event.detail)),
         onControlPlay: event => dispatch(play(event.detail)),
         onControlPause: event => dispatch(pause(event.detail)),
+        onControlSeek: event => dispatch(seek(event.detail)),
+        onControlStop: event => dispatch(stop(event.detail)),
         onVideo: (source, name, duration, url = null) => dispatch(loadVideoFromServer(source, name, duration, url)),
     })
 )(Socket);

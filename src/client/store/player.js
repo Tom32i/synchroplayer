@@ -4,9 +4,12 @@ const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
 const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
 const PLAYER_COMPLETE_FROM_FILE = 'PLAYER_COMPLETE_FROM_FILE';
 const PLAYER_SET_DURATION = 'PLAYER_SET_DURATION';
-const PLAYER_READY = 'PLAYER_READY';
+const PLAYER_LOADED = 'PLAYER_LOADED';
+const PLAYER_AUTHORIZED = 'PLAYER_AUTHORIZED';
 const PLAYER_PLAY = 'PLAYER_PLAY';
 const PLAYER_PAUSE = 'PLAYER_PAUSE';
+const PLAYER_SEEK = 'PLAYER_SEEK';
+const PLAYER_STOP = 'PLAYER_STOP';
 
 export function loadVideoFromFile(url, name, size, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, size, type, source: 'file' } };
@@ -32,16 +35,28 @@ export function setDuration(duration) {
     return { type: PLAYER_SET_DURATION, payload: { duration } };
 }
 
-export function setReady(ready) {
-    return { type: PLAYER_READY, payload: { ready } };
+export function setLoaded(loaded) {
+    return { type: PLAYER_LOADED, payload: { loaded } };
 }
 
-export function play() {
-    return { type: PLAYER_PLAY };
+export function setAuthorized(authorized) {
+    return { type: PLAYER_AUTHORIZED, payload: { authorized } };
 }
 
-export function pause() {
-    return { type: PLAYER_PAUSE };
+export function play(time) {
+    return { type: PLAYER_PLAY, payload: { time } };
+}
+
+export function pause(time) {
+    return { type: PLAYER_PAUSE, payload: { time } };
+}
+
+export function seek(time) {
+    return { type: PLAYER_SEEK, payload: { time } };
+}
+
+export function stop() {
+    return { type: PLAYER_STOP };
 }
 
 const initialState = {
@@ -51,9 +66,11 @@ const initialState = {
     name: null,
     duration: null,
     subtitle: null,
-    ready: false,
+    loaded: false,
+    authorized: true,
     playing: false,
     fromServer: false,
+    time: 0,
 };
 
 export default function player(state = initialState, action) {
@@ -68,7 +85,7 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 size: payload.size,
                 source: payload.source,
-                ready: false,
+                // loaded: false,
                 fromServer: false,
             };
 
@@ -80,7 +97,7 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 size: payload.size,
                 source: payload.source,
-                ready: false,
+                // loaded: false,
                 fromServer: false,
             };
 
@@ -90,7 +107,7 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 source: payload.source,
-                ready: false,
+                // ready: false,
                 fromServer: true,
             };
 
@@ -101,7 +118,7 @@ export default function player(state = initialState, action) {
                 name: payload.name,
                 type: payload.type,
                 size: payload.size,
-                ready: false,
+                // ready: false,
             };
 
         case PLAYER_SET_DURATION:
@@ -110,14 +127,23 @@ export default function player(state = initialState, action) {
         case PLAYER_LOAD_SUBTITLE:
             return { ...state, subtitle: payload.url };
 
-        case PLAYER_READY:
-            return { ...state, ready: payload.ready };
+        case PLAYER_LOADED:
+            return { ...state, loaded: payload.loaded };
+
+        case PLAYER_AUTHORIZED:
+            return { ...state, authorized: payload.authorized };
 
         case PLAYER_PLAY:
-            return { ...state, playing: true };
+            return { ...state, playing: true, time: payload.time };
 
         case PLAYER_PAUSE:
-            return { ...state, playing: false };
+            return { ...state, playing: false, time: payload.time };
+
+        case PLAYER_SEEK:
+            return { ...state, time: payload.time };
+
+        case PLAYER_STOP:
+            return { ...state, playing: false, time: 0 };
 
         default:
             return state;
