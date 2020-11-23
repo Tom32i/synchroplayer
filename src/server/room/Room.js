@@ -12,6 +12,7 @@ export default class Room {
         this.onClientReady = this.onClientReady.bind(this);
         this.onClientPlay = this.onClientPlay.bind(this);
         this.onClientPause = this.onClientPause.bind(this);
+        this.onClientEnd = this.onClientEnd.bind(this);
         this.onClientStop = this.onClientStop.bind(this);
         this.onClientSeek = this.onClientSeek.bind(this);
         this.onClientVideoFile = this.onClientVideoFile.bind(this);
@@ -31,6 +32,7 @@ export default class Room {
         client.on('user:ready', this.onClientReady);
         client.on('control:play', this.onClientPlay);
         client.on('control:pause', this.onClientPause);
+        client.on('control:end', this.onClientEnd);
         client.on('control:stop', this.onClientStop);
         client.on('control:seek', this.onClientSeek);
         client.on('video:file', this.onClientVideoFile);
@@ -45,6 +47,7 @@ export default class Room {
         client.off('user:ready', this.onClientReady);
         client.off('control:play', this.onClientPlay);
         client.off('control:pause', this.onClientPause);
+        client.off('control:end', this.onClientEnd);
         client.off('control:stop', this.onClientStop);
         client.off('control:seek', this.onClientSeek);
         client.off('video:file', this.onClientVideoFile);
@@ -111,6 +114,12 @@ export default class Room {
         if (!this.video) { return; }
 
         this.video.pause(time);
+    }
+
+    onClientEnd() {
+        if (!this.video) { return; }
+
+        this.video.end();
     }
 
     onClientStop() {

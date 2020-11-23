@@ -29,6 +29,7 @@ export default class Showtime {
         this.playing = false;
         this.stopWatching();
         this.loop.stop();
+        this.onActivity();
     }
 
     onUIEnter() {

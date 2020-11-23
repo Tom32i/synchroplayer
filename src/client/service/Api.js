@@ -43,6 +43,10 @@ export default class Api {
         this.client.send('control:pause', time);
     }
 
+    end() {
+        this.client.send('control:end');
+    }
+
     stop() {
         this.client.send('control:stop');
     }
@@ -56,7 +60,6 @@ export default class Api {
     }
 
     loadVideo(source, name, url) {
-        console.log('api', `video:${source}`, { url, name });
         this.client.send(`video:${source}`, { url, name });
     }
 }

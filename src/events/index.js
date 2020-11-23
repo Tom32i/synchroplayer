@@ -13,6 +13,7 @@ export default [
     ['control:play', new SeekCodec()],
     ['control:pause', new SeekCodec()],
     ['control:seek', new SeekCodec()],
+    ['control:end', new Codec()],
     ['control:stop', new Codec()],
     ['video:file', new FileVideoCodec()],
     ['video:url', new UrlVideoCodec()],

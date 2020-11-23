@@ -140,7 +140,7 @@ class Socket extends Component {
 export default connect(
     state => {
         const { loaded, authorized, url, source, name, fromServer } = state.player;
-        console.log(url, source, name, fromServer);
+
         return {
             ready: loaded && authorized,
             video: url && source && name ? { url, source, name, fromServer } : null,

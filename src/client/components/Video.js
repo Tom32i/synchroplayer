@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setLoaded, setAuthorized, setDuration } from '@client/store/player';
+import { setLoaded, setAuthorized, setDuration, end } from '@client/store/player';
 import Subtitles from '@client/components/Subtitles';
 
 class Video extends Component {
@@ -14,9 +14,11 @@ class Video extends Component {
         setDuration: PropTypes.func.isRequired,
         setLoaded: PropTypes.func.isRequired,
         setAuthorized: PropTypes.func.isRequired,
+        end: PropTypes.func.isRequired,
         onTimeUpdate: PropTypes.func.isRequired,
         onPlayed: PropTypes.func.isRequired,
         onPaused: PropTypes.func.isRequired,
+        onEnded: PropTypes.func.isRequired,
         preload: PropTypes.string,
     };
 
@@ -36,6 +38,7 @@ class Video extends Component {
         this.onCanPlay = this.onCanPlay.bind(this);
         this.onDurationChange = this.onDurationChange.bind(this);
         this.onNotAuthorized = this.onNotAuthorized.bind(this);
+        this.onEnded = this.onEnded.bind(this);
         this.onAuthorized = this.onAuthorized.bind(this);
         this.onError = this.onError.bind(this);
     }
@@ -118,6 +121,11 @@ class Video extends Component {
         this.props.setDuration(this.element.duration);
     }
 
+    onEnded() {
+        this.props.end();
+        this.props.onEnded();
+    }
+
     onError(error) {
         console.error(error);
     }
@@ -136,6 +144,7 @@ class Video extends Component {
                 onTimeUpdate={this.props.onTimeUpdate}
                 onPlay={this.props.onPlayed}
                 onPause={this.props.onPaused}
+                onEnded={this.onEnded}
             >
                 <Subtitles />
             </video>
@@ -155,6 +164,7 @@ export default connect(
         setDuration: duration => dispatch(setDuration(duration)),
         setLoaded: authorized => dispatch(setLoaded(authorized)),
         setAuthorized: loaded => dispatch(setAuthorized(loaded)),
+        end: () => dispatch(end()),
     }),
     null,
     { forwardRef: true }

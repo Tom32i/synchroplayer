@@ -10,6 +10,7 @@ const PLAYER_AUTHORIZED = 'PLAYER_AUTHORIZED';
 const PLAYER_PLAY = 'PLAYER_PLAY';
 const PLAYER_PAUSE = 'PLAYER_PAUSE';
 const PLAYER_SEEK = 'PLAYER_SEEK';
+const PLAYER_END = 'PLAYER_END';
 const PLAYER_STOP = 'PLAYER_STOP';
 const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
 
@@ -59,6 +60,10 @@ export function pause(time) {
 
 export function seek(time) {
     return { type: PLAYER_SEEK, payload: { time } };
+}
+
+export function end() {
+    return { type: PLAYER_END };
 }
 
 export function stop() {
@@ -179,6 +184,9 @@ export default function player(state = initialState, action) {
 
         case PLAYER_SEEK:
             return { ...state, time: payload.time };
+
+        case PLAYER_END:
+            return { ...state, playing: false, time: state.duration };
 
         case PLAYER_STOP:
             return { ...state, playing: false, time: 0 };

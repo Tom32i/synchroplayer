@@ -25,6 +25,7 @@ class Player extends Component {
         this.setVideo = this.setVideo.bind(this);
         this.setTimeline = this.setTimeline.bind(this);
         this.onTimeUpdate = this.onTimeUpdate.bind(this);
+        this.onEnded = this.onEnded.bind(this);
         this.onPlay = this.onPlay.bind(this);
         this.onPause = this.onPause.bind(this);
         this.onStop = this.onStop.bind(this);
@@ -45,6 +46,11 @@ class Player extends Component {
         if (this.timeline) {
             this.timeline.setTime(this.video.currentTime, this.video.duration);
         }
+    }
+
+    onEnded() {
+        this.api.end();
+        this.showtime.onPaused();
     }
 
     onSeek(progress) {
@@ -74,18 +80,21 @@ class Player extends Component {
     }
 
     render() {
-        const { onPlayed, onPaused, onUIEnter, onUILeave } = this.showtime;
-
         return (
             <figure className="player">
                 <AuthorizationModal />
                 <Video
                     ref={this.setVideo}
                     onTimeUpdate={this.onTimeUpdate}
-                    onPlayed={onPlayed}
-                    onPaused={onPaused}
+                    onPlayed={this.showtime.onPlayed}
+                    onPaused={this.showtime.onPaused}
+                    onEnded={this.onEnded}
                 />
-                <div className="player-bottom-bar" onMouseEnter={onUIEnter} onMouseLeave={onUILeave}>
+                <div
+                    className="player-bottom-bar"
+                    onMouseEnter={this.showtime.onUIEnter}
+                    onMouseLeave={this.showtime.onUILeave}
+                >
                     <Timeline ref={this.setTimeline} onSeek={this.onSeek} />
                     <Controls
                         onStop={this.onStop}

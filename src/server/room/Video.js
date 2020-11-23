@@ -42,6 +42,15 @@ export default class Video extends EventEmitter {
         }
     }
 
+    end() {
+        if (this.playing || this.currentTime > 0) {
+            this.playedAt = null;
+            this.currentTime = this.time;
+            this.emit('end');
+            console.warn('Video ended.');
+        }
+    }
+
     stop() {
         if (this.playing || this.currentTime > 0) {
             this.playedAt = null;
