@@ -55,7 +55,7 @@ export default class Api {
         this.client.send('user:ready', { id: 0, ready });
     }
 
-    loadVideo(source, name, duration, url) {
-        this.client.send(`video:${source}`, { url, name, duration });
+    loadVideo(source, name, url) {
+        this.client.send(`video:${source}`, { url, name });
     }
 }

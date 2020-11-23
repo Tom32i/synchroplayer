@@ -57,7 +57,7 @@ export default class GetRequest {
     }
 
     onError(error) {
-        const message = `Request to "${this.url}" failed with status "${this.request.status}".`;
+        const message = `Request to "${this.url}" failed with status "${this.request.status}": ${error}`;
         this.clear();
         this.error(new Error(message));
     }

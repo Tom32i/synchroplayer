@@ -87,9 +87,9 @@ export default class Room {
         });
 
         if (this.video) {
-            const { source, url, name, duration } = this.video;
+            const { source, url, name } = this.video;
 
-            client.send(`video:${source}`, { url, name, duration });
+            client.send(`video:${source}`, { url, name });
             client.send('control:seek', this.video.currentTime);
         }
     }
@@ -123,11 +123,11 @@ export default class Room {
     }
 
     onClientVideoFile(data, client) {
-        this.setVideo(new Video('file', null, data.name, data.duration), client);
+        this.setVideo(new Video('file', null, data.name), client);
     }
 
     onClientVideoUrl(data, client) {
-        this.setVideo(new Video('url', data.url, data.name, data.duration), client);
+        this.setVideo(new Video('url', data.url, data.name), client);
     }
 
     setVideo(video, client) {
@@ -144,9 +144,9 @@ export default class Room {
         video.on('seek', this.onVideoSeek);
         video.on('stop', this.onVideoStop);
 
-        const { source, url, name, duration } = video;
+        const { source, url, name } = video;
 
-        this.sendToOther(client, `video:${source}`, { url, name, duration });
+        this.sendToOther(client, `video:${source}`, { url, name });
 
         this.video = video;
 

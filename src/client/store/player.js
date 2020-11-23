@@ -12,20 +12,20 @@ const PLAYER_SEEK = 'PLAYER_SEEK';
 const PLAYER_STOP = 'PLAYER_STOP';
 const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
 
-export function loadVideoFromFile(url, name, size, type) {
-    return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, size, type, source: 'file' } };
+export function loadVideoFromFile(url, name, type) {
+    return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'file' } };
 }
 
-export function loadVideoFromUrl(url, name, size, type) {
-    return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, size, type, source: 'url' } };
+export function loadVideoFromUrl(url, name, type) {
+    return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'url' } };
 }
 
-export function loadVideoFromServer(source, name, duration, url = null) {
-    return { type: PLAYER_LOAD_FROM_SERVER, payload: { source, name, duration, url } };
+export function loadVideoFromServer(source, name, url = null) {
+    return { type: PLAYER_LOAD_FROM_SERVER, payload: { source, name, url } };
 }
 
-export function completeVideoFromFile(url, name, size, type = null) {
-    return { type: PLAYER_COMPLETE_FROM_FILE, payload: { url, name, size, type } };
+export function completeVideoFromFile(url, name, type = null) {
+    return { type: PLAYER_COMPLETE_FROM_FILE, payload: { url, name, type } };
 }
 
 export function loadSubtitle(url, label) {
@@ -113,9 +113,7 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 type: payload.type,
-                size: payload.size,
                 source: payload.source,
-                // loaded: false,
                 fromServer: false,
             };
 
@@ -125,9 +123,7 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 type: payload.type,
-                size: payload.size,
                 source: payload.source,
-                // loaded: false,
                 fromServer: false,
             };
 
@@ -137,7 +133,6 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 source: payload.source,
-                // ready: false,
                 fromServer: true,
             };
 
@@ -147,8 +142,6 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 type: payload.type,
-                size: payload.size,
-                // ready: false,
             };
 
         case PLAYER_SET_DURATION:

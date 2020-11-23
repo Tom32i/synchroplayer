@@ -97,9 +97,9 @@ class Socket extends Component {
         }
 
         if (video && (!prevProps.video || video.url !== prevProps.video.url) && !video.fromServer) {
-            const { source, name, duration, url } = video;
+            const { source, name, url } = video;
 
-            this.api.loadVideo(source, name, duration, url);
+            this.api.loadVideo(source, name, url);
         }
     }
 

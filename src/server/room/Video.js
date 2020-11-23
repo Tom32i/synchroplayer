@@ -1,13 +1,12 @@
 import EventEmitter from 'tom32i-event-emitter.js';
 
 export default class Video extends EventEmitter {
-    constructor(source, url, name, duration) {
+    constructor(source, url, name) {
         super();
 
         this.source = source;
         this.url = url;
         this.name = name;
-        this.duration = duration;
         this.playedAt = null;
         this.at = null;
         this.currentTime = 0;

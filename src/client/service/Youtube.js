@@ -17,13 +17,11 @@ export default class Youtube {
         return null;
     }
 
-    getVideoInfo(url) {
+    getVideoInfo(url, success, failure) {
         new JsonRequest(
             `//${this.host}/youtube?url=${encodeURIComponent(url)}`,
-            data => {
-                console.log(data);
-            },
-            error => console.error(error)
+            success,
+            failure
         );
     }
 }

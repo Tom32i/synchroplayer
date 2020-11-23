@@ -24,8 +24,6 @@ export default class DropHandler {
         document.addEventListener('dragover', this.onDragOver);
         document.addEventListener('drop', this.onDrop);
         document.addEventListener('paste', this.onPaste);
-
-        this.handleText('https://youtu.be/BathEBfiG1s');
     }
 
     onDragOver(event) {
@@ -120,18 +118,12 @@ export default class DropHandler {
         const id = this.youtube.getVideoId(value);
 
         if (id) {
-            this.youtube.getVideoInfo(value);
-
-            return;
-
-            /* const url = value.replace(...YOUTUBE_MATCHER);
-
-            return this.store.dispatch(
-                loadVideoFromUrl(url, 'youtube video')
-            );*/
+            return this.youtube.getVideoInfo(value, data => {
+                const { title, formats } = data;
+                console.log(formats[0].url.length);
+                this.store.dispatch(loadVideoFromUrl(formats[0].url, title, formats[0].type));
+            }, error => console.error(error));
         }
-
-        console.log('not matched');
 
         const matches = value.match(URL_MATCHER);
 
