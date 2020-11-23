@@ -1,5 +1,6 @@
 const PLAYER_LOAD_FROM_FILE = 'PLAYER_LOAD_FROM_FILE';
 const PLAYER_LOAD_FROM_URL = 'PLAYER_LOAD_FROM_URL';
+const PLAYER_LOAD_FROM_YOUTUBE = 'PLAYER_LOAD_FROM_YOUTUBE';
 const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
 const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
 const PLAYER_COMPLETE_FROM_FILE = 'PLAYER_COMPLETE_FROM_FILE';
@@ -18,6 +19,10 @@ export function loadVideoFromFile(url, name, type) {
 
 export function loadVideoFromUrl(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'url' } };
+}
+
+export function loadVideoFromYoutube(url, name, type) {
+    return { type: PLAYER_LOAD_FROM_YOUTUBE, payload: { url, name, type, source: 'youtube' } };
 }
 
 export function loadVideoFromServer(source, name, url = null) {
@@ -108,6 +113,16 @@ export default function player(state = initialState, action) {
 
     switch (type) {
         case PLAYER_LOAD_FROM_FILE:
+            return {
+                ...state,
+                url: payload.url,
+                name: payload.name,
+                type: payload.type,
+                source: payload.source,
+                fromServer: false,
+            };
+
+        case PLAYER_LOAD_FROM_YOUTUBE:
             return {
                 ...state,
                 url: payload.url,

@@ -56,6 +56,7 @@ export default class Api {
     }
 
     loadVideo(source, name, url) {
+        console.log('api', `video:${source}`, { url, name });
         this.client.send(`video:${source}`, { url, name });
     }
 }

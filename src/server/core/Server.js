@@ -1,5 +1,4 @@
 import NetcodeServer from 'netcode/src/server/Server';
-// import MapClientDirectory from 'netcode/src/server/MapClientDirectory';
 import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
 import events from '@events';
 import RoomManager from '@server/room/RoomManager';
@@ -9,7 +8,7 @@ export default class Server extends NetcodeServer {
     static YOUTUBE = /^\/youtube\?url=(.+)$/i;
 
     constructor(port = 8001, hostname = '0.0.0.0') {
-        super(port, hostname, new BinaryEncoder(events), 30, Math.pow(2, 11), undefined, false);
+        super(port, hostname, new BinaryEncoder(events), 30, Math.pow(2, 12), undefined, false);
 
         this.joinMatcher = new RegExp('^/([^/]+)/?$');
         this.rooms = new RoomManager();

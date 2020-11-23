@@ -1,4 +1,4 @@
-import { loadVideoFromFile, loadVideoFromUrl, loadSubtitle, completeVideoFromFile } from '@client/store/player';
+import { loadVideoFromFile, loadVideoFromUrl, loadVideoFromYoutube, loadSubtitle, completeVideoFromFile } from '@client/store/player';
 import HeadRequest from '@client/http/HeadRequest';
 
 const EXTENTION_MATCHER = /\.(\w+)$/i;
@@ -120,8 +120,8 @@ export default class DropHandler {
         if (id) {
             return this.youtube.getVideoInfo(value, data => {
                 const { title, formats } = data;
-                console.log(formats[0].url.length);
-                this.store.dispatch(loadVideoFromUrl(formats[0].url, title, formats[0].type));
+
+                this.store.dispatch(loadVideoFromYoutube(formats[0].url, title, formats[0].type));
             }, error => console.error(error));
         }
 

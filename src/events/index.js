@@ -16,4 +16,5 @@ export default [
     ['control:stop', new Codec()],
     ['video:file', new FileVideoCodec()],
     ['video:url', new UrlVideoCodec()],
+    ['video:youtube', new UrlVideoCodec()],
 ];

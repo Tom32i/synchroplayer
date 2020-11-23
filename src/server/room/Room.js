@@ -16,6 +16,7 @@ export default class Room {
         this.onClientSeek = this.onClientSeek.bind(this);
         this.onClientVideoFile = this.onClientVideoFile.bind(this);
         this.onClientVideoUrl = this.onClientVideoUrl.bind(this);
+        this.onClientVideoYoutube = this.onClientVideoYoutube.bind(this);
         this.onUserReady = this.onUserReady.bind(this);
         this.onVideoPlay = this.onVideoPlay.bind(this);
         this.onVideoPause = this.onVideoPause.bind(this);
@@ -34,6 +35,7 @@ export default class Room {
         client.on('control:seek', this.onClientSeek);
         client.on('video:file', this.onClientVideoFile);
         client.on('video:url', this.onClientVideoUrl);
+        client.on('video:youtube', this.onClientVideoYoutube);
     }
 
     removeClient(client) {
@@ -47,6 +49,7 @@ export default class Room {
         client.off('control:seek', this.onClientSeek);
         client.off('video:file', this.onClientVideoFile);
         client.off('video:url', this.onClientVideoUrl);
+        client.off('video:youtube', this.onClientVideoYoutube);
     }
 
     createUser(client) {
@@ -128,6 +131,10 @@ export default class Room {
 
     onClientVideoUrl(data, client) {
         this.setVideo(new Video('url', data.url, data.name), client);
+    }
+
+    onClientVideoYoutube(data, client) {
+        this.setVideo(new Video('youtube', data.url, data.name), client);
     }
 
     setVideo(video, client) {
