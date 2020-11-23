@@ -3,16 +3,29 @@
     display: block;
     position: relative;
     height: 0.6em;
-    background-color: rgba($color-light, 0.5);
+    background-color: rgba($color-light, 0.25);
     border-radius: 0.3em;
     overflow: hidden;
 
     &.disabled {
-       background-color: rgba($color-light, 0.2);
+       background-color: rgba($color-light, 0.1);
     }
 
-    .active {
+    .loaded {
         display: block;
+        position: absolute;
+        z-index: 10;
+        left: 0%;
+        right: 100%;
+        height: 100%;
+        background-color: rgba($color-light, 0.25);
+    }
+
+    .played {
+        display: block;
+        position: absolute;
+        left: 0;
+        z-index: 20;
         height: 100%;
         width: 0%;
         background-color: $color-primary;

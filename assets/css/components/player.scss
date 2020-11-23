@@ -40,6 +40,16 @@
 
 .player-timeline {
     margin: 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+
+    .times {
+        display: flex;
+        justify-content: space-between;
+        color: rgba(white, 0.8);
+        margin: 20px 0;
+    }
 }
 
 .showtime {

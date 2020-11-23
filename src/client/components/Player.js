@@ -25,6 +25,7 @@ class Player extends Component {
         this.setVideo = this.setVideo.bind(this);
         this.setTimeline = this.setTimeline.bind(this);
         this.onTimeUpdate = this.onTimeUpdate.bind(this);
+        this.onProgress = this.onProgress.bind(this);
         this.onEnded = this.onEnded.bind(this);
         this.onPlay = this.onPlay.bind(this);
         this.onPause = this.onPause.bind(this);
@@ -45,6 +46,13 @@ class Player extends Component {
     onTimeUpdate() {
         if (this.timeline) {
             this.timeline.setTime(this.video.currentTime, this.video.duration);
+        }
+    }
+
+    onProgress() {
+        if (this.timeline) {
+            // console.log(this.video.loadedMin, this.video.loadedMax);
+            this.timeline.setLoadedParts(this.video.buffered, this.video.duration);
         }
     }
 
@@ -86,6 +94,7 @@ class Player extends Component {
                 <Video
                     ref={this.setVideo}
                     onTimeUpdate={this.onTimeUpdate}
+                    onProgress={this.onProgress}
                     onPlayed={this.showtime.onPlayed}
                     onPaused={this.showtime.onPaused}
                     onEnded={this.onEnded}

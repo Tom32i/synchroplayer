@@ -16,6 +16,7 @@ class Video extends Component {
         setAuthorized: PropTypes.func.isRequired,
         end: PropTypes.func.isRequired,
         onTimeUpdate: PropTypes.func.isRequired,
+        onProgress: PropTypes.func.isRequired,
         onPlayed: PropTypes.func.isRequired,
         onPaused: PropTypes.func.isRequired,
         onEnded: PropTypes.func.isRequired,
@@ -36,6 +37,7 @@ class Video extends Component {
         this.play = this.play.bind(this);
         this.onLoadStart = this.onLoadStart.bind(this);
         this.onCanPlay = this.onCanPlay.bind(this);
+        this.onCanPlayThrough = this.onCanPlayThrough.bind(this);
         this.onDurationChange = this.onDurationChange.bind(this);
         this.onNotAuthorized = this.onNotAuthorized.bind(this);
         this.onEnded = this.onEnded.bind(this);
@@ -47,6 +49,7 @@ class Video extends Component {
     get duration() { return this.element.duration; }
     get seekMin() { return this.element.seekable.start(0); }
     get seekMax() { return this.element.seekable.end(0); }
+    get buffered() { return this.element.buffered; }
 
     componentDidUpdate(prevProps) {
         const { time, playing } = this.props;
@@ -117,6 +120,10 @@ class Video extends Component {
         }
     }
 
+    onCanPlayThrough() {
+
+    }
+
     onDurationChange() {
         this.props.setDuration(this.element.duration);
     }
@@ -139,7 +146,9 @@ class Video extends Component {
                 src={src}
                 preload={preload}
                 onLoadStart={this.onLoadStart}
+                onProgress={this.props.onProgress}
                 onCanPlay={this.onCanPlay}
+                onCanPlayThrough={this.onCanPlayThrough}
                 onDurationChange={this.onDurationChange}
                 onTimeUpdate={this.props.onTimeUpdate}
                 onPlay={this.props.onPlayed}

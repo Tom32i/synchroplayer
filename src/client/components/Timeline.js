@@ -12,10 +12,14 @@ export default class Timeline extends Component {
         this.container = null;
 
         this.state = {
-            percent: 0,
+            time: '',
+            duration: '',
+            loaded: [],
+            played: 0,
         };
 
         this.setContainer = this.setContainer.bind(this);
+        this.renderLoadedPart = this.renderLoadedPart.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
     }
 
@@ -24,7 +28,41 @@ export default class Timeline extends Component {
     }
 
     setTime(time, duration) {
-        this.setState({ percent: (time / duration * 100).toFixed(3) });
+        this.setState({
+            played: this.formetPercent(time, duration),
+            time: this.formatTime(time),
+            duration: this.formatTime(duration),
+        });
+    }
+
+    setLoadedParts(buffered, duration) {
+        const { length } = buffered;
+        const parts = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+            parts[i] = [
+                this.formetPercent(buffered.start(i), duration),
+                this.formetPercent(buffered.end(i), duration)
+            ];
+        }
+
+        this.setState({ loaded: parts });
+    }
+
+    formetPercent(time, duration) {
+        return (time / duration * 100).toFixed(3);
+    }
+
+    formatTime(time) {
+        const hours = Math.floor(time / 3600);
+        const minutes = Math.floor(time / 60) % 60;
+        const seconds = time % 60;
+
+        if (hours) {
+            return `${hours}:${minutes.toFixed(0).padStart(2, 0)}:${seconds.toFixed(0).padStart(2, 0)}`;
+        }
+
+        return `${minutes}:${seconds.toFixed(0).padStart(2, 0)}`;
     }
 
     onMouseDown(event) {
@@ -35,13 +73,24 @@ export default class Timeline extends Component {
         return event.offsetX / this.container.offsetWidth;
     }
 
+    renderLoadedPart(part, index) {
+        const [start, end] = part;
+
+        return <div key={index} className="loaded" style={{ left: `${start}%`, right: `${100 - end}%` }} />;
+    }
+
     render() {
-        const { percent } = this.state;
+        const { played, loaded, time, duration } = this.state;
 
         return (
-            <div  className="player-timeline">
+            <div className="player-timeline">
+                <div className="times">
+                    <span className="time-current">{time}</span>
+                    <span className="time-duration">{duration}</span>
+                </div>
                 <div className="progress-bar" ref={this.setContainer} onMouseDown={this.onMouseDown}>
-                    <div className="active" style={{ width: `${percent}%` }} />
+                    {loaded.map(this.renderLoadedPart)}
+                    <div className="played" style={{ width: `${played}%` }} />
                 </div>
             </div>
         );
