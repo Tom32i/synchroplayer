@@ -16,6 +16,7 @@ class Video extends Component {
         setAuthorized: PropTypes.func.isRequired,
         end: PropTypes.func.isRequired,
         onTimeUpdate: PropTypes.func.isRequired,
+        onDurationChange: PropTypes.func.isRequired,
         onProgress: PropTypes.func.isRequired,
         onPlayed: PropTypes.func.isRequired,
         onPaused: PropTypes.func.isRequired,
@@ -126,6 +127,7 @@ class Video extends Component {
 
     onDurationChange() {
         this.props.setDuration(this.element.duration);
+        this.props.onDurationChange();
     }
 
     onEnded() {

@@ -1,17 +1,28 @@
+import GetRequest from '@client/http/GetRequest';
+
 export default class SubtitleConverter {
     static CONTENT_REPLACER = [
         /(\d{2}:\d{2}:\d{2}),(\d{3} --> \d{2}:\d{2}:\d{2}),(\d{3})/gi,
         '$1.$2.$3',
     ];
+
     static FILENAME_REPLACER = [
         /^(.+)\.srt$/ig,
         '$1.vtt',
     ];
 
-    srtToVtt(file, callback) {
+    srtFileToVttFile(file, callback) {
         this.readFromFile(
             file,
             content => callback(this.convertToVtt(content, file.name)),
+            error => callback(error)
+        );
+    }
+
+    srtUrlToVttFile(url, callback) {
+        new GetRequest(
+            url,
+            content => callback(this.convertToVtt(content, url)),
             error => callback(error)
         );
     }

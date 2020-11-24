@@ -1,8 +1,7 @@
 import { loadVideoFromFile, loadVideoFromUrl, loadVideoFromYoutube, loadSubtitle, completeVideoFromFile } from '@client/store/player';
 import HeadRequest from '@client/http/HeadRequest';
 
-const EXTENTION_MATCHER = /\.(\w+)$/i;
-const URL_MATCHER = /^https?:\/\/.+\/([^/]+\.\w+)$/i;
+const FILENAME_MATCHER = /^\/?(.+)\.(\w+)$/i;
 
 export default class DropHandler {
     constructor(store, converter, youtube) {
@@ -39,9 +38,9 @@ export default class DropHandler {
     }
 
     onPaste(event) {
-        this.handleText(
-            (event.clipboardData || window.clipboardData).getData('text').trim()
-        );
+        const content = (event.clipboardData || window.clipboardData).getData('text');
+
+        content.split('\n').forEach(line => this.handleText(line.trim()))
     }
 
     handleDrop(item) {
@@ -81,18 +80,14 @@ export default class DropHandler {
                 break;
         }
 
-        const matches = name.match(EXTENTION_MATCHER);
+        switch (this.getExtention(name)) {
+            case 'srt':
+                this.handleSrtSubtitle(file);
+                break;
 
-        if (matches) {
-            switch (matches[1]) {
-                case 'srt':
-                    this.handleSrtSubtitle(file);
-                    break;
-
-                case 'vtt':
-                    this.handleSubtitle(file);
-                    break;
-            }
+            case 'vtt':
+                this.handleSubtitle(file);
+                break;
         }
     }
 
@@ -102,7 +97,7 @@ export default class DropHandler {
         const action = isFileFromServer ? completeVideoFromFile : loadVideoFromFile;
 
         this.store.dispatch(
-            action(URL.createObjectURL(file), file.name, file.size,file.type)
+            action(URL.createObjectURL(file), file.name, file.size, file.type)
         );
     }
 
@@ -111,7 +106,19 @@ export default class DropHandler {
     }
 
     handleSrtSubtitle(file) {
-        this.converter.srtToVtt(file, this.handleSubtitle);
+        this.converter.srtFileToVttFile(file, this.handleSubtitle);
+    }
+
+    handleVideoUrl(url, name, type) {
+        this.store.dispatch(loadVideoFromUrl(url, name, type));
+    }
+
+    handleSubtitleUrl(url, name, type) {
+        this.store.dispatch(loadSubtitle(url, name, type));
+    }
+
+    handleSrtSubtitleUrl(url) {
+        this.converter.srtUrlToVttFile(url, this.handleSubtitle);
     }
 
     handleText(value) {
@@ -125,16 +132,53 @@ export default class DropHandler {
             }, error => console.error(error));
         }
 
-        const matches = value.match(URL_MATCHER);
+        const { href, pathname } = this.getUrl(value);
 
-        if (matches) {
-            const [url, name] = matches;
+        if (href) {
+            return new HeadRequest(href, ['Content-Type', 'Content-Length'], ([type]) => {
+                switch (type) {
+                    case 'video/webm':
+                    case 'video/mp4':
+                        this.handleVideoUrl(href, pathname, type);
+                        break;
 
-            return new HeadRequest(url, ['Content-Type', 'Content-Length'], ([type, size]) => {
-                return this.store.dispatch(
-                    loadVideoFromUrl(url, name, type)
-                );
+                    case 'text/vtt':
+                        this.handleSubtitleUrl(href, pathname, type);
+                        break;
+
+                    case 'text/srt':
+                        this.handleSrtSubtitleUrl(href, pathname, type);
+                        break;
+                }
+
+                switch (this.getExtention(pathname)) {
+                    case 'vtt':
+                        this.handleSubtitleUrl(href, pathname, type);
+                        break;
+
+                    case 'srt':
+                        this.handleSrtSubtitleUrl(href, pathname, type);
+                        break;
+                }
             }, error => console.error(error));
+        }
+    }
+
+    getExtention(filename) {
+        const matches = filename.match(FILENAME_MATCHER);
+
+        if (!matches) {
+            return null;
+        }
+
+        return matches[2];
+    }
+
+    getUrl(value) {
+        try {
+            return new URL(value);
+        } catch (error) {
+            return {};
         }
     }
 }

@@ -94,6 +94,7 @@ class Player extends Component {
                 <Video
                     ref={this.setVideo}
                     onTimeUpdate={this.onTimeUpdate}
+                    onDurationChange={this.onTimeUpdate}
                     onProgress={this.onProgress}
                     onPlayed={this.showtime.onPlayed}
                     onPaused={this.showtime.onPaused}
