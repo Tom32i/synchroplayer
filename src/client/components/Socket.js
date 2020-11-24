@@ -140,10 +140,11 @@ class Socket extends Component {
 export default connect(
     state => {
         const { loaded, authorized, url, source, name, fromServer } = state.player;
+        const { connected } = state.room;
 
         return {
-            ready: loaded && authorized,
-            video: url && source && name ? { url, source, name, fromServer } : null,
+            ready: connected && loaded && authorized,
+            video: connected && url && source && name ? { url, source, name, fromServer } : null,
         };
     },
     dispatch => ({
