@@ -132,7 +132,7 @@ export default class DropHandler {
 
             return new HeadRequest(url, ['Content-Type', 'Content-Length'], ([type, size]) => {
                 return this.store.dispatch(
-                    loadVideoFromUrl(url, name, parseInt(size, 10), type)
+                    loadVideoFromUrl(url, name, type)
                 );
             }, error => console.error(error));
         }
