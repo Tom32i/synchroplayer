@@ -21,7 +21,9 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "reset-css": "^5.0.1",
-    "tom32i-event-emitter.js": "^2.0.4"
+    "tom32i-event-emitter.js": "^2.0.4",
+    "webtorrent": "^0.111.0",
+    "ytdl-core": "^4.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",

@@ -1,16 +1,15 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const resolve = {
-  alias: {
-    '@events': `${__dirname}/src/events`,
-    '@client': `${__dirname}/src/client`,
-    '@server': `${__dirname}/src/server`,
-    '@css': `${__dirname}/assets/css`,
-  }
+const alias = {
+  '@events': `${__dirname}/src/events`,
+  '@client': `${__dirname}/src/client`,
+  '@server': `${__dirname}/src/server`,
+  '@css': `${__dirname}/assets/css`,
 };
 
 const clientConfig = {
   target: 'web',
+  //node: false,
   entry: './src/client/index.js',
   output: {
     filename: 'client.js',
@@ -45,7 +44,17 @@ const clientConfig = {
       },
     ]
   },
-  resolve,
+  resolve: {
+    alias,
+    /*fallback: {
+      path: false,
+      url: false,
+      fs: false,
+      querystring: false,
+      http: false,
+      https: false,
+    },*/
+  },
   plugins: [
     new HtmlWebpackPlugin({ template: './index.html' })
   ]
@@ -72,7 +81,9 @@ const serverConfig = {
       }
     ]
   },
-  resolve,
+  resolve: {
+    alias,
+  }
 };
 
 module.exports = [ serverConfig, clientConfig ];
