@@ -1,7 +1,9 @@
+import WebTorrent from 'webtorrent/webtorrent.min.js';
 import { loadVideoFromFile, loadVideoFromUrl, loadVideoFromYoutube, loadSubtitle, completeVideoFromFile } from '@client/store/player';
 import HeadRequest from '@client/http/HeadRequest';
 
 const FILENAME_MATCHER = /^\/?(.+)\.(\w+)$/i;
+const MAGNET_MATCHER = /^magnet:/i;
 
 export default class DropHandler {
     constructor(store, converter, youtube) {
@@ -132,6 +134,36 @@ export default class DropHandler {
             }, error => console.error(error));
         }
 
+        if (this.isMagnet(value)) {
+            //localStorage.debug = '*';
+            console.log(WebTorrent.WEBRTC_SUPPORT);
+            const client = new WebTorrent();
+            /*client.on('torrent', torrent => {
+                console.log('torrent', torrent);
+                torrent.on('infoHash', (...args) => console.log('infoHash', args));
+                torrent.on('metadata', (...args) => console.log('metadata', args));
+                torrent.on('ready', (...args) => console.log('ready', args));
+                torrent.on('warning', (...args) => console.log('warning', args));
+                torrent.on('error', (...args) => console.log('error', args));
+                torrent.on('done', (...args) => console.log('done', args));
+                torrent.on('download', (...args) => console.log('download', args));
+                torrent.on('upload', (...args) => console.log('upload', args));
+                torrent.on('wire', (...args) => console.log('wire', args));
+                torrent.on('noPeers', (...args) => console.log('noPeers', args));
+            });*/
+            //client.on('error', () => console.error(error));
+
+            return client.add(value, [], torrent => {
+              // Got torrent metadata!
+              console.log('Client is downloading:', torrent.infoHash)
+
+              torrent.files.forEach(file => {
+                //this.handleFile(file);
+                console.log('File', file);
+              });
+            })
+        }
+
         const { href, pathname } = this.getUrl(value);
 
         if (href) {
@@ -180,5 +212,9 @@ export default class DropHandler {
         } catch (error) {
             return {};
         }
+    }
+
+    isMagnet(value) {
+        return MAGNET_MATCHER.test(value);
     }
 }
