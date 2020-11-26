@@ -71,7 +71,9 @@ class Video extends Component {
     setElement(element) {
         this.element = element;
 
-        this.element.volume = this.props.volume;
+        if (element) {
+            this.element.volume = this.props.volume;
+        }
     }
 
     play() {
@@ -177,7 +179,7 @@ export default connect(
         time: state.player.time,
         authorized: state.player.authorized,
         loaded: state.player.loaded,
-        volume: state.player.volume,
+        volume: state.options.volume,
     }),
     dispatch => ({
         setDuration: duration => dispatch(setDuration(duration)),

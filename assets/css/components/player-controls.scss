@@ -8,19 +8,26 @@
         font-size: 40px;
         width: 2em;
         height: 1.6em;
-        color: white;
+        color: rgba(white, 0.8);
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0;
         padding: 0;
-        opacity: 0.8;
         text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.66);
-        transition: transform 100ms ease-out;
+        transition: transform 100ms ease-out, color 100ms ease-out;
 
-        &:hover {
-            opacity: 1;
+        &:not([disabled]):hover {
+            color: rgba(white, 1);
             transform: scale3d(1.1, 1.1, 1);
+        }
+
+        &[disabled] {
+            color:  rgba($text-grey-light, 0.8);
+        }
+
+        &[disabled] .icon-loader {
+            color: $color-primary;
         }
     }
 
@@ -38,6 +45,10 @@
             justify-content: flex-end;
         }
     }
+}
+
+.player.loading .icon-play {
+    content: "\e90e";
 }
 
 :fullscreen {

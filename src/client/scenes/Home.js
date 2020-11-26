@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import I18n from 'i18n-js';
 import { connect } from 'react-redux';
 import { navigate } from '@client/navigation/store';
 
@@ -22,7 +23,7 @@ class Home extends Component {
         return(
             <div className="home">
                 <h1 className="title">Synchroplayer</h1>
-                <p className="stater">Drop a video to start</p>
+                <p className="starter">{I18n.t('home.starter')}</p>
             </div>
         );
     }

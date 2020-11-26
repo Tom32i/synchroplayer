@@ -7,6 +7,7 @@ import VolumeControl from '@client/components/VolumeControl';
 class Controls extends Component {
     static propTypes = {
         playing: PropTypes.bool.isRequired,
+        loaded: PropTypes.bool.isRequired,
         onPlay: PropTypes.func.isRequired,
         onPause: PropTypes.func.isRequired,
         onStop: PropTypes.func.isRequired,
@@ -30,7 +31,6 @@ class Controls extends Component {
     }
 
     componentDidMount() {
-        console.log('Moun');
         document.addEventListener('click', this.onClick);
         document.addEventListener('keyup', this.onKey);
     }
@@ -102,19 +102,19 @@ class Controls extends Component {
     }
 
     render() {
-        const { playing, onStop, onBackward, onForward } = this.props;
-        const playIcon = playing ? 'icon-pause' : 'icon-play';
+        const { playing, loaded, onStop, onBackward, onForward } = this.props;
+        const playIcon = loaded ? playing ? 'icon-pause' : 'icon-play' : 'icon-loader';
         const screenIcon = this.fullscreen ? 'icon-minimise' : 'icon-maximise';
 
         return (
             <div className="player-controls">
                 <div className="group">
-                    <Button label={<span className="icon-stop" />} onClick={onStop} />
+                    <Button disabled={!loaded} label={<span className="icon-stop" />} onClick={onStop} />
                 </div>
                 <div className="group">
-                    <Button label={<span className="icon-backward" onClick={onBackward} />} />
-                    <Button label={<span className={playIcon} />} onClick={this.togglePlay} />
-                    <Button label={<span className="icon-forward" onClick={onForward} />} />
+                    <Button disabled={!loaded} label={<span className="icon-backward" onClick={onBackward} />} />
+                    <Button disabled={!loaded} label={<span className={playIcon} />} onClick={this.togglePlay} />
+                    <Button disabled={!loaded} label={<span className="icon-forward" onClick={onForward} />} />
                 </div>
                 <div className="group">
                     <VolumeControl />
@@ -128,5 +128,6 @@ class Controls extends Component {
 export default connect(
     state => ({
         playing: state.player.playing,
+        loaded: state.player.loaded,
     })
 )(Controls);

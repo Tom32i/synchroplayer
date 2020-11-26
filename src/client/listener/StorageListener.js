@@ -1,4 +1,4 @@
-import { setVolume } from '@client/store/player';
+import { setVolume } from '@client/store/options';
 
 export default class StorageListener {
     static VOLUME = 'VOLUME';
@@ -13,7 +13,7 @@ export default class StorageListener {
 
     static getProps(state) {
         return {
-            volume: state.player.volume,
+            volume: state.options.volume,
         };
     }
 

@@ -8,4 +8,10 @@
     justify-content: center;
     color: $text-light;
     overflow: hidden;
+
+    .placeholder {
+        font-size: 1.4em;
+        color: $text-light;
+        text-shadow: 0 0.1em 0.1em rgba(black, 0.3);
+    }
 }

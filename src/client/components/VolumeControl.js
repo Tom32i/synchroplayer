@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { setVolume } from '@client/store/player';
+import { setVolume } from '@client/store/options';
 
 class VolumeControl extends Component {
     static propTypes = {
@@ -65,7 +65,7 @@ class VolumeControl extends Component {
 
 export default connect(
     state => ({
-        volume: state.player.volume,
+        volume: state.options.volume,
     }),
     dispatch => ({
         setVolume: volume => dispatch(setVolume(volume)),

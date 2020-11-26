@@ -1,9 +1,10 @@
-const SOCKET_OPEN = 'ROOM_SOCKET_OPEN';
-const SOCKET_CLOSE = 'ROOM_SOCKET_CLOSE';
-const ROOM_ME = 'ROOM_ME';
-const ROOM_USER_ADD = 'ROOM_USER_ADD';
-const ROOM_USER_REMOVE = 'ROOM_USER_REMOVE';
-const ROOM_USER_READY = 'ROOM_USER_READY';
+export const SOCKET_OPEN = 'ROOM_SOCKET_OPEN';
+export const SOCKET_CLOSE = 'ROOM_SOCKET_CLOSE';
+export const ROOM_ME = 'ROOM_ME';
+export const ROOM_USER_ADD = 'ROOM_USER_ADD';
+export const ROOM_USER_REMOVE = 'ROOM_USER_REMOVE';
+export const ROOM_USER_READY = 'ROOM_USER_READY';
+export const ROOM_LEAVE = 'ROOM_LEAVE';
 
 // ACTIONS
 
@@ -29,6 +30,10 @@ export function userRemove(id) {
 
 export function userReady(payload) {
     return { type: ROOM_USER_READY, payload };
+}
+
+export function leave() {
+    return { type: ROOM_LEAVE };
 }
 
 // INITIAL STATES
@@ -98,6 +103,9 @@ export default function room(state = initialState, action) {
                 ...state,
                 users: state.users.map(userState => user(userState, action)),
             };
+
+        case ROOM_LEAVE:
+            return initialState;
 
         default:
             return state;

@@ -5,6 +5,7 @@ import I18n from 'i18n-js';
 import Socket from '@client/components/Socket';
 import Player from '@client/components/Player';
 import UserList from '@client/components/UserList';
+import { leave } from '@client/store/room';
 
 class Room extends Component {
     static propTypes = {
@@ -13,12 +14,17 @@ class Room extends Component {
         source: PropTypes.string,
         name: PropTypes.string,
         showtime: PropTypes.bool.isRequired,
+        onLeave: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
         source: null,
         name: null,
     };
+
+    componentWillUnmount() {
+        this.props.onLeave();
+    }
 
     renderContent() {
         const { source, url, name } = this.props;
@@ -53,5 +59,8 @@ export default connect(
         url: state.player.url !== null,
         name: state.player.name,
         showtime: state.player.showtime,
+    }),
+    dispatch => ({
+        onLeave: () => dispatch(leave()),
     })
 )(Room);

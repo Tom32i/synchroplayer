@@ -1,19 +1,20 @@
-const PLAYER_LOAD_FROM_FILE = 'PLAYER_LOAD_FROM_FILE';
-const PLAYER_LOAD_FROM_URL = 'PLAYER_LOAD_FROM_URL';
-const PLAYER_LOAD_FROM_YOUTUBE = 'PLAYER_LOAD_FROM_YOUTUBE';
-const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
-const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
-const PLAYER_COMPLETE_FROM_FILE = 'PLAYER_COMPLETE_FROM_FILE';
-const PLAYER_SET_DURATION = 'PLAYER_SET_DURATION';
-const PLAYER_LOADED = 'PLAYER_LOADED';
-const PLAYER_AUTHORIZED = 'PLAYER_AUTHORIZED';
-const PLAYER_PLAY = 'PLAYER_PLAY';
-const PLAYER_PAUSE = 'PLAYER_PAUSE';
-const PLAYER_SEEK = 'PLAYER_SEEK';
-const PLAYER_END = 'PLAYER_END';
-const PLAYER_STOP = 'PLAYER_STOP';
-const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
-const PLAYER_VOLUME = 'PLAYER_VOLUME';
+import { ROOM_LEAVE } from '@client/store/room';
+
+export const PLAYER_LOAD_FROM_FILE = 'PLAYER_LOAD_FROM_FILE';
+export const PLAYER_LOAD_FROM_URL = 'PLAYER_LOAD_FROM_URL';
+export const PLAYER_LOAD_FROM_YOUTUBE = 'PLAYER_LOAD_FROM_YOUTUBE';
+export const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
+export const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
+export const PLAYER_COMPLETE_FROM_FILE = 'PLAYER_COMPLETE_FROM_FILE';
+export const PLAYER_SET_DURATION = 'PLAYER_SET_DURATION';
+export const PLAYER_LOADED = 'PLAYER_LOADED';
+export const PLAYER_AUTHORIZED = 'PLAYER_AUTHORIZED';
+export const PLAYER_PLAY = 'PLAYER_PLAY';
+export const PLAYER_PAUSE = 'PLAYER_PAUSE';
+export const PLAYER_SEEK = 'PLAYER_SEEK';
+export const PLAYER_END = 'PLAYER_END';
+export const PLAYER_STOP = 'PLAYER_STOP';
+export const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
 
 export function loadVideoFromFile(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'file' } };
@@ -75,10 +76,6 @@ export function setShowtime(active) {
     return { type: PLAYER_SHOWTIME, payload: { active } };
 }
 
-export function setVolume(volume) {
-    return { type: PLAYER_VOLUME, payload: { volume } };
-}
-
 const initialState = {
     url: null,
     source: null,
@@ -92,7 +89,6 @@ const initialState = {
     fromServer: false,
     time: 0,
     showtime: false,
-    volume: 0.5,
 };
 
 const inititalSubtitleState = {
@@ -208,8 +204,8 @@ export default function player(state = initialState, action) {
         case PLAYER_SHOWTIME:
             return { ...state, showtime: payload.active };
 
-        case PLAYER_VOLUME:
-            return { ...state, volume: payload.volume };
+        case ROOM_LEAVE:
+            return initialState;
 
         default:
             return state;

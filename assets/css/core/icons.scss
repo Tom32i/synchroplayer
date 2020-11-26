@@ -20,6 +20,7 @@ $icons: (
   "volume-low": "\e911",
   "volume-medium": "\e912",
   "volume-high": "\e913",
+  "loader": "\e90e",
 );
 
 @font-face {
@@ -33,7 +34,7 @@ $icons: (
   font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="icon-"], [class*=" icon-"], .icon-internal {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: '#{$ico-font-family}' !important;
   speak: never;
@@ -52,4 +53,8 @@ $icons: (
   .icon-#{$name}:before {
     content: $glyph;
   }
+}
+
+.icon-loader {
+  animation: rotation 2s infinite linear;
 }
