@@ -6,12 +6,22 @@ import Router from '@client/scenes';
 import '@client/translations';
 import '@css/style.scss';
 
+// Setup router
 get('router')
     .set('home', '/')
     .set('room', '/{id}', { id: '[^/]+' })
     .loadUrl();
 
+// Listen for drop file
 get('drop-handler').start();
+
+// Register listeners
+get('watcher')
+    .subscribeAll(['listener:storage'].map(get))
+    .start();
+
+// Load options from storage
+get('listener:storage').load();
 
 render(
     <Provider store={get('store')}>
