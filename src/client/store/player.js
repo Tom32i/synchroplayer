@@ -80,7 +80,6 @@ const initialState = {
     type: null,
     name: null,
     duration: null,
-    subtitle: null,
     subtitles: [],
     loaded: false,
     authorized: true,
@@ -125,6 +124,9 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 source: payload.source,
                 fromServer: false,
+                playing: false,
+                time: 0,
+                subtitles: state.url ? [] : state.subtitles,
             };
 
         case PLAYER_LOAD_FROM_YOUTUBE:
@@ -135,6 +137,9 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 source: payload.source,
                 fromServer: false,
+                playing: false,
+                time: 0,
+                subtitles: state.url ? [] : state.subtitles,
             };
 
         case PLAYER_LOAD_FROM_URL:
@@ -145,6 +150,9 @@ export default function player(state = initialState, action) {
                 type: payload.type,
                 source: payload.source,
                 fromServer: false,
+                playing: false,
+                time: 0,
+                subtitles: state.url ? [] : state.subtitles,
             };
 
         case PLAYER_LOAD_FROM_SERVER:
