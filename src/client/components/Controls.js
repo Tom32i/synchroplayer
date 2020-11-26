@@ -17,12 +17,74 @@ class Controls extends Component {
     constructor(props) {
         super(props);
 
+        this.timeout = null;
+
         this.togglePlay = this.togglePlay.bind(this);
         this.toggleFullscreen = this.toggleFullscreen.bind(this);
+        this.onKey = this.onKey.bind(this);
+        this.onClick = this.onClick.bind(this);
     }
 
     get fullscreen() {
         return !!document.fullscreenElement;
+    }
+
+    componentDidMount() {
+        console.log('Moun');
+        document.addEventListener('click', this.onClick);
+        document.addEventListener('keyup', this.onKey);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('click', this.onClick);
+        document.removeEventListener('keyup', this.onKey);
+    }
+
+    onKey(event) {
+        switch (event.keyCode) {
+            // Space
+            case 32:
+                this.cancel(event);
+                this.togglePlay();
+                break;
+            // Left
+            case 37:
+                this.cancel(event);
+                this.props.onBackward();
+                break;
+
+            // Right
+            case 39:
+                this.cancel(event);
+                this.props.onForward();
+                break;
+        }
+    }
+
+    cancel(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    onClick(event) {
+        if (event.target.tagName.toLowerCase() !== 'video') {
+            return;
+        }
+
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+
+        switch (event.detail) {
+            case 1:
+                this.timeout = setTimeout(this.togglePlay, 350);
+                break;
+
+            case 2:
+                this.toggleFullscreen();
+                break;
+        }
     }
 
     toggleFullscreen() {

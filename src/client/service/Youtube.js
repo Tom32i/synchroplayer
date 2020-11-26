@@ -1,7 +1,7 @@
 import JsonRequest from '@client/http/JsonRequest';
 
 export default class Youtube {
-    static MATCHER = /^https?:\/\/(www\.)?(youtu\.be\/|youtube\.com)\/.+$/i;
+    static MATCHER = /^https?:\/\/(www\.)?(youtu\.be|youtube\.com)\//i;
 
     constructor(host) {
         this.host = host;
