@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '@client/components/Button';
+import VolumeControl from '@client/components/VolumeControl';
 
 class Controls extends Component {
     static propTypes = {
@@ -54,6 +55,7 @@ class Controls extends Component {
                     <Button label={<span className="icon-forward" onClick={onForward} />} />
                 </div>
                 <div className="group">
+                    <VolumeControl />
                     <Button label={<span className={screenIcon} />} onClick={this.toggleFullscreen} />
                 </div>
             </div>

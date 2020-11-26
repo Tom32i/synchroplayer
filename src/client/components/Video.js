@@ -22,6 +22,7 @@ class Video extends Component {
         onPaused: PropTypes.func.isRequired,
         onEnded: PropTypes.func.isRequired,
         preload: PropTypes.string,
+        volume: PropTypes.number.isRequired,
     };
 
     static defaultProps = {
@@ -53,7 +54,7 @@ class Video extends Component {
     get buffered() { return this.element.buffered; }
 
     componentDidUpdate(prevProps) {
-        const { time, playing } = this.props;
+        const { time, playing, volume } = this.props;
 
         if (playing !== prevProps.playing) {
             this.seek(time);
@@ -61,10 +62,16 @@ class Video extends Component {
         } else if (time !== prevProps.time) {
             this.seek(time);
         }
+
+        if (volume !== prevProps.volume) {
+            this.element.volume = this.props.volume;
+        }
     }
 
     setElement(element) {
         this.element = element;
+
+        this.element.volume = this.props.volume;
     }
 
     play() {
@@ -170,6 +177,7 @@ export default connect(
         time: state.player.time,
         authorized: state.player.authorized,
         loaded: state.player.loaded,
+        volume: state.player.volume,
     }),
     dispatch => ({
         setDuration: duration => dispatch(setDuration(duration)),

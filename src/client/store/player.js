@@ -13,6 +13,7 @@ const PLAYER_SEEK = 'PLAYER_SEEK';
 const PLAYER_END = 'PLAYER_END';
 const PLAYER_STOP = 'PLAYER_STOP';
 const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
+const PLAYER_VOLUME = 'PLAYER_VOLUME';
 
 export function loadVideoFromFile(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'file' } };
@@ -74,6 +75,10 @@ export function setShowtime(active) {
     return { type: PLAYER_SHOWTIME, payload: { active } };
 }
 
+export function setVolume(volume) {
+    return { type: PLAYER_VOLUME, payload: { volume } };
+}
+
 const initialState = {
     url: null,
     source: null,
@@ -87,6 +92,7 @@ const initialState = {
     fromServer: false,
     time: 0,
     showtime: false,
+    volume: 0.5,
 };
 
 const inititalSubtitleState = {
@@ -201,6 +207,9 @@ export default function player(state = initialState, action) {
 
         case PLAYER_SHOWTIME:
             return { ...state, showtime: payload.active };
+
+        case PLAYER_VOLUME:
+            return { ...state, volume: payload.volume };
 
         default:
             return state;

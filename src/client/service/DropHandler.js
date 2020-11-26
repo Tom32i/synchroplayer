@@ -40,7 +40,7 @@ export default class DropHandler {
     onPaste(event) {
         const content = (event.clipboardData || window.clipboardData).getData('text');
 
-        content.split('\n').forEach(line => this.handleText(line.trim()))
+        content.split('\n').forEach(line => this.handleText(line.trim()));
     }
 
     handleDrop(item) {
