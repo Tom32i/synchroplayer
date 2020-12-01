@@ -1,6 +1,7 @@
 export default class Loop {
-    constructor(callback) {
+    constructor(callback, interval = null) {
         this.callback = callback;
+        this.interval = interval;
         this.frame = null;
         this.update = this.update.bind(this);
     }
@@ -16,7 +17,7 @@ export default class Loop {
             return;
         }
 
-        this.frame = window.requestAnimationFrame(this.update);
+        this.requestFrame();
     }
 
     stop() {
@@ -24,13 +25,29 @@ export default class Loop {
             return;
         }
 
-        window.cancelAnimationFrame(this.frame);
+        this.cancelFrame();
+    }
+
+    cancelFrame() {
+        if (this.interval !== null) {
+            window.cancelAnimationFrame(this.frame);
+        } else {
+            clearTimeout(this.frame);
+        }
 
         this.frame = null;
     }
 
+    requestFrame() {
+        if (this.interval !== null) {
+            this.frame = window.requestAnimationFrame(this.update);
+        } else {
+            this.frame = setTimeout(this.update, this.interval);
+        }
+    }
+
     update() {
-        this.frame = window.requestAnimationFrame(this.update);
+        this.requestFrame();
         this.callback();
     }
 }

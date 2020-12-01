@@ -26,6 +26,9 @@
             "version": "detect"
         }
     },
+    "globals": {
+        "YT": "readonly"
+    },
     "rules": {
         "indent": [
             "error",

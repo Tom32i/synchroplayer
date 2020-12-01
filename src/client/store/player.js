@@ -7,6 +7,7 @@ export const PLAYER_LOAD_FROM_SERVER = 'PLAYER_LOAD_FROM_SERVER';
 export const PLAYER_LOAD_SUBTITLE = 'PLAYER_LOAD_SUBTITLE';
 export const PLAYER_COMPLETE_FROM_FILE = 'PLAYER_COMPLETE_FROM_FILE';
 export const PLAYER_SET_DURATION = 'PLAYER_SET_DURATION';
+export const PLAYER_SET_NAME = 'PLAYER_SET_NAME';
 export const PLAYER_LOADED = 'PLAYER_LOADED';
 export const PLAYER_AUTHORIZED = 'PLAYER_AUTHORIZED';
 export const PLAYER_PLAY = 'PLAYER_PLAY';
@@ -24,8 +25,8 @@ export function loadVideoFromUrl(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'url' } };
 }
 
-export function loadVideoFromYoutube(url, name, type) {
-    return { type: PLAYER_LOAD_FROM_YOUTUBE, payload: { url, name, type, source: 'youtube' } };
+export function loadVideoFromYoutube(url) {
+    return { type: PLAYER_LOAD_FROM_YOUTUBE, payload: { url, source: 'youtube' } };
 }
 
 export function loadVideoFromServer(source, name, url = null) {
@@ -38,6 +39,10 @@ export function completeVideoFromFile(url, name, type = null) {
 
 export function loadSubtitle(url, label) {
     return { type: PLAYER_LOAD_SUBTITLE, payload: { url, label } };
+}
+
+export function setName(name) {
+    return { type: PLAYER_SET_NAME, payload: { name } };
 }
 
 export function setDuration(duration) {
@@ -122,6 +127,7 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
+                sources: [],
                 name: payload.name,
                 type: payload.type,
                 source: payload.source,
@@ -135,8 +141,7 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                name: payload.name,
-                type: payload.type,
+                sources: [],
                 source: payload.source,
                 fromServer: false,
                 playing: false,
@@ -148,6 +153,7 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
+                sources: [],
                 name: payload.name,
                 type: payload.type,
                 source: payload.source,
@@ -161,6 +167,7 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
+                sources: [],
                 name: payload.name,
                 source: payload.source,
                 fromServer: true,
@@ -176,6 +183,9 @@ export default function player(state = initialState, action) {
 
         case PLAYER_SET_DURATION:
             return { ...state, duration: payload.duration };
+
+        case PLAYER_SET_NAME:
+            return { ...state, name: payload.name };
 
         case PLAYER_LOAD_SUBTITLE:
             return { ...state, subtitles: state.subtitles.concat([ subtitle(undefined, action) ]) };

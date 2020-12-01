@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { setLoaded, setAuthorized, setDuration, end } from '@client/store/player';
 import Subtitles from '@client/components/Subtitles';
 
-class Video extends Component {
+export default class Video extends Component {
     static propTypes = {
         src: PropTypes.string.isRequired,
         playing: PropTypes.bool.isRequired,
@@ -47,18 +45,16 @@ class Video extends Component {
         this.onError = this.onError.bind(this);
     }
 
-    get currentTime() { return this.element.currentTime; }
-    get duration() { return this.element.duration; }
-    get seekMin() { return this.element.seekable.start(0); }
-    get seekMax() { return this.element.seekable.end(0); }
+
+    get currentTime() { return parseFloat(this.element.currentTime.toFixed(3), 10); }
+    get duration() { return parseFloat(this.element.duration.toFixed(3), 10); }
     get buffered() { return this.element.buffered; }
 
     componentDidUpdate(prevProps) {
         const { time, playing, volume } = this.props;
 
         if (playing !== prevProps.playing) {
-            this.seek(time);
-            playing ? this.play() : this.pause();
+            playing ? this.play(time) : this.pause(time);
         } else if (time !== prevProps.time) {
             this.seek(time);
         }
@@ -76,7 +72,9 @@ class Video extends Component {
         }
     }
 
-    play() {
+    play(time) {
+        this.seek(time);
+
         let promise = null;
 
         try {
@@ -92,8 +90,13 @@ class Video extends Component {
         }
     }
 
-    pause() {
+    pause(time) {
         this.element.pause();
+        this.seek(time);
+    }
+
+    stop() {
+        this.element.stop();
     }
 
     seek(time) {
@@ -171,22 +174,3 @@ class Video extends Component {
         );
     }
 }
-
-export default connect(
-    state => ({
-        src: state.player.url,
-        playing: state.player.playing,
-        time: state.player.time,
-        authorized: state.player.authorized,
-        loaded: state.player.loaded,
-        volume: state.options.volume,
-    }),
-    dispatch => ({
-        setDuration: duration => dispatch(setDuration(duration)),
-        setLoaded: authorized => dispatch(setLoaded(authorized)),
-        setAuthorized: loaded => dispatch(setAuthorized(loaded)),
-        end: () => dispatch(end()),
-    }),
-    null,
-    { forwardRef: true }
-)(Video);

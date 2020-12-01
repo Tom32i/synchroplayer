@@ -125,11 +125,7 @@ export default class DropHandler {
         const id = this.youtube.getVideoId(value);
 
         if (id) {
-            return this.youtube.getVideoInfo(value, data => {
-                const { title, formats } = data;
-
-                this.store.dispatch(loadVideoFromYoutube(formats[0].url, title, formats[0].type));
-            }, error => console.error(error));
+            return this.store.dispatch(loadVideoFromYoutube(id));
         }
 
         const { href, pathname } = this.getUrl(value);
