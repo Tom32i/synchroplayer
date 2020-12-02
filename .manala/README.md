@@ -5,6 +5,9 @@
 * [Quick start](#quick-start)
 * [System](#system)
 * [Integration](#integration)
+    * [Jenkins](#jenkins)
+    * [Github Actions](#github-actions)
+    * [Common Integration Tasks](#common-integration-tasks)
 * [Releases](#releases)
 * [Makefile](#makefile)
 * [Secrets](#secrets)
@@ -242,7 +245,9 @@ system:
 
 ## Integration
 
-Here are some examples of integration configurations in `.manala.yaml`:
+### Jenkins
+
+Here are some examples of integration configurations in `.manala.yaml` for Jenkins:
 
 ```yaml
 ###############
@@ -310,6 +315,17 @@ integration:
               - shell: make lint.eslint@integration
               - shell: make test.jest@integration
 ```
+
+### Github Actions
+
+The recipes generates a `Dockerfile` and a `docker-compose.yaml` file that can 
+be used to provide a fully-fledged environnement according to your project needs.
+
+The [Elao/manala-ci-action](https://github.com/Elao/manala-ci-action) rely on 
+this to allow you running any CLI command in this environnement, 
+using Github Action workflows.
+
+### Common integration tasks
 
 Add in your `Makefile`:
 

@@ -18,8 +18,7 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "reset-css": "^5.0.1",
-    "tom32i-event-emitter.js": "^2.0.4",
-    "ytdl-core": "^4.0.6"
+    "tom32i-event-emitter.js": "^2.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",

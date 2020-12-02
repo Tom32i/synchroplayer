@@ -23,6 +23,9 @@ get('watcher')
 // Load options from storage
 get('listener:storage').load();
 
+// Youtube API
+window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {};
+
 render(
     <Provider store={get('store')}>
         <Router />

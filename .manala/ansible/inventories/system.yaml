@@ -308,7 +308,7 @@ system:
               - proxy_set_header: X-Forwarded-For $proxy_add_x_forwarded_for
             file: app_ws_proxy
           - config:
-              - add_header: Access-Control-Allow-Origin "http://synchroplayer.vm" always
+              - add_header: Access-Control-Allow-Origin * always
               - add_header: Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always
               - add_header: Access-Control-Allow-Headers "Authorization, Content-Type, Accept-Encoding, Cache-Control" always
               - add_header: Access-Control-Allow-Credentials "true" always

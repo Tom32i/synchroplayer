@@ -67,7 +67,7 @@ class Controls extends Component {
     }
 
     onClick(event) {
-        if (event.target.tagName.toLowerCase() !== 'video') {
+        if (event.target.tagName.toLowerCase() !== 'figure') {
             return;
         }
 

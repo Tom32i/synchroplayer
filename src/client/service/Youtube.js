@@ -1,20 +1,21 @@
 import JsonRequest from '@client/http/JsonRequest';
 
 export default class Youtube {
-    static MATCHER = /^https?:\/\/(www\.)?(youtu\.be|youtube\.com)\//i;
+    static MATCHER = /^https?:\/\/(youtu\.be|www\.youtube\.com)\/(watch\?v=)?([^&]+).*$/i;
+
 
     constructor(host) {
         this.host = host;
     }
 
     getVideoId(url) {
-        const match = url.match(this.constructor.MATCHER);
+        const matches = url.match(this.constructor.MATCHER);
 
-        if (match) {
-            return match[2];
+        if (!matches) {
+            return null;
         }
 
-        return null;
+        return matches.pop();
     }
 
     getVideoInfo(url, success, failure) {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
 import { setShowtime } from '@client/store/player';
-import Video from '@client/components/Video';
+import { Video, YoutubeVideo } from '@client/components/video';
 import Controls from '@client/components/Controls';
 import Timeline from '@client/components/Timeline';
 import AuthorizationModal from '@client/components/AuthorizationModal';
@@ -11,6 +11,7 @@ import Showtime from '@client/common/Showtime';
 
 class Player extends Component {
     static propTypes = {
+        source: PropTypes.string.isRequired,
         setShowtime: PropTypes.func.isRequired,
     };
 
@@ -51,7 +52,6 @@ class Player extends Component {
 
     onProgress() {
         if (this.timeline) {
-            // console.log(this.video.loadedMin, this.video.loadedMax);
             this.timeline.setLoadedParts(this.video.buffered, this.video.duration);
         }
     }
@@ -88,10 +88,13 @@ class Player extends Component {
     }
 
     render() {
+        const { source } = this.props;
+        const VideoComponent = source === 'youtube' ? YoutubeVideo : Video;
+
         return (
             <figure className="player">
                 <AuthorizationModal />
-                <Video
+                <VideoComponent
                     ref={this.setVideo}
                     onTimeUpdate={this.onTimeUpdate}
                     onDurationChange={this.onTimeUpdate}
@@ -99,6 +102,8 @@ class Player extends Component {
                     onPlayed={this.showtime.onPlayed}
                     onPaused={this.showtime.onPaused}
                     onEnded={this.onEnded}
+                    onPlay={this.onPlay}
+                    onPause={this.onPause}
                 />
                 <div
                     className="player-bottom-bar"
@@ -120,7 +125,9 @@ class Player extends Component {
 }
 
 export default connect(
-    null,
+    state => ({
+        source: state.player.source,
+    }),
     dispatch => ({
         setShowtime: showtime => dispatch(setShowtime(showtime)),
     })

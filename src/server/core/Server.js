@@ -2,11 +2,8 @@ import NetcodeServer from 'netcode/src/server/Server';
 import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
 import events from '@events';
 import RoomManager from '@server/room/RoomManager';
-import YoutubeRequest from '@server/service/YoutubeRequest';
 
 export default class Server extends NetcodeServer {
-    static YOUTUBE = /^\/youtube\?url=(.+)$/i;
-
     constructor(port = 8001, hostname = '0.0.0.0') {
         super(port, hostname, new BinaryEncoder(events), 30, Math.pow(2, 12), undefined, false);
 
@@ -73,15 +70,6 @@ export default class Server extends NetcodeServer {
      * @param {Response} response
      */
     handleRequest(request, response) {
-        const { url } = request;
-
-        const youtubeMatch = url.match(this.constructor.YOUTUBE);
-
-        // Youtube url
-        if (youtubeMatch) {
-            return this.handleYoutubeRequest(decodeURIComponent(youtubeMatch[1]), response);
-        }
-
         // Anything else
         response.writeHead(404);
 
@@ -124,15 +112,5 @@ export default class Server extends NetcodeServer {
      */
     onError(error) {
         throw error;
-    }
-
-    handleYoutubeRequest(url, response) {
-        new YoutubeRequest(url, data => {
-            response.writeHead(200, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify(data));
-        }, error => {
-            response.writeHead(500, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify(error.message));
-        });
     }
 }
