@@ -31,6 +31,3 @@ start-client:
 
 start-server:
 	node bin/server.js 8001
-
-start-demo:
-	php -S 0.0.0.0:8002 -t demo

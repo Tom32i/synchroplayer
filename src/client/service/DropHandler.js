@@ -68,6 +68,7 @@ export default class DropHandler {
         switch (type) {
             case 'video/webm':
             case 'video/mp4':
+            case 'video/quicktime':
                 this.handleVideo(file);
                 break;
 
@@ -78,9 +79,16 @@ export default class DropHandler {
             case 'text/srt':
                 this.handleSrtSubtitle(file);
                 break;
+
+            default:
+                if (type) {
+                    console.info(`File type "${type}" not supported.`);
+                }
         }
 
-        switch (this.getExtention(name)) {
+        const extension = this.getExtention(name)
+
+        switch (extension) {
             case 'srt':
                 this.handleSrtSubtitle(file);
                 break;
@@ -88,6 +96,13 @@ export default class DropHandler {
             case 'vtt':
                 this.handleSubtitle(file);
                 break;
+
+            case 'mkv':
+                this.handleVideo(file);
+                break;
+
+            default:
+                console.info(`File extension "${extension}" not supported.`);
         }
     }
 
