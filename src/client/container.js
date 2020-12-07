@@ -19,7 +19,6 @@ const { hostname, port, protocol } = window.location;
 container.registerParameter('config:host', port ? `${hostname}:${parseInt(port, 10) + 1}` : `server.${hostname}`);
 container.registerParameter('config:protocol', protocol.replace('http', 'ws'));
 container.registerParameter('config:debug', process.env.NODE_ENV === 'development');
-// container.registerParameter('config:youtube-api-key', 'AIzaSyA8OWflhcxlQHFUvmp7t3j0ZMjFHoUuPEc');
 
 // Redux store:
 container.registerCallback('store', createStore, ['config:debug']);
