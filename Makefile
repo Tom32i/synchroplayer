@@ -1,12 +1,6 @@
 .SILENT:
 .PHONY: build
 
--include .manala/Makefile
-
-define setup
-	make install build
-endef
-
 ## Install dependencies
 install:
 	npm install

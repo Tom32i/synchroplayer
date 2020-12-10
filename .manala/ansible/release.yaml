@@ -1,5 +1,0 @@
----
-
-- hosts: release
-  roles:
-    - release
