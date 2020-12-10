@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import I18n from 'i18n-js';
 import { connect } from 'react-redux';
 import { navigate } from '@client/navigation/store';
+import Logo from '@client/components/Logo';
+import AboutButton from '@client/components/AboutButton';
+import AboutModal from '@client/components/AboutModal';
 
 class Home extends Component {
     static propTypes = {
@@ -24,6 +27,11 @@ class Home extends Component {
             <div className="home">
                 <h1 className="title">Synchroplayer</h1>
                 <p className="starter">{I18n.t('home.starter')}</p>
+                <div className="top-bar">
+                    <Logo />
+                    <AboutButton />
+                </div>
+                <AboutModal />
             </div>
         );
     }
