@@ -1,0 +1,23 @@
+{
+    "home": {
+        "starter": "Déposez un fichier vidéo ou un lien pour commencer !"
+    },
+    "player": {
+        "authorization": {
+            "title": "Autoriser la lecture ?",
+            "content": "Sur ce navigateur, Synchroplayer a besoin de votre autorisation pour lancer la video.",
+            "ok": "Accepter"
+        }
+    },
+    "room": {
+        "drop_to_start": "Déposez un fichier vidéo ou un lien pour commencer !",
+        "drop_file": "Déposer le fichier \"{{name}}\" pour rejoindre"
+    },
+    "about": {
+        "button": "À propos",
+        "title": "À propos de Synchroplayer",
+        "content": "",
+        "github_link": "Voir le projet",
+        "close": "Fermer"
+    }
+}

@@ -1,0 +1,45 @@
+.user-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    z-index: 10;
+    font-size: 32px;
+    transition: transform 300ms;
+
+    .user {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 1em;
+        height: 1em;
+        margin: 0.5em;
+        border-radius: 100%;
+
+        sup {
+            font-size: 0.6em;
+            position: absolute;
+            top: 0;
+            right: 0;
+            text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.66);
+        }
+
+        &.me {
+            background-color: rgba(white, 0.2);
+        }
+
+        &.ready sup {
+            color: green;
+        }
+
+        &.loading sup {
+            color: red;
+        }
+    }
+
+    .showtime & {
+        transform: translateY(-100%);
+    }
+}

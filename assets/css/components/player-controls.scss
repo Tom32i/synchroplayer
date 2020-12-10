@@ -1,0 +1,36 @@
+.player-controls {
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    button {
+        @extend .button;
+        font-size: 40px;
+    }
+
+    .group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+
+        &:first-child {
+            justify-content: flex-start;
+        }
+
+        &:last-child {
+            justify-content: flex-end;
+        }
+    }
+}
+
+.player.loading .icon-play {
+    content: "\e90e";
+}
+
+:fullscreen {
+    .player-controls .icon-maximise:before {
+        content: "\e907";
+    }
+}

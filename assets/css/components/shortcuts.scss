@@ -1,0 +1,35 @@
+.shortcuts {
+    width: 100%;
+}
+
+.shortcut-definition {
+    display: flex;
+    margin: 0.2em 0;
+
+    .shortcut-keys {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .shortcut {
+        background-color: $color-light;
+        color: $color-dark;
+        border-radius: 2px;
+        padding: 0.2em 0.4em;
+        white-space: nowrap;
+        display: block;
+    }
+
+    .shortcut + .shortcut {
+        margin-left: 0.5em;
+    }
+
+    .label {
+        flex: 2;
+        text-align: left;
+        white-space: nowrap;
+        margin-left: 1em;
+    }
+}
