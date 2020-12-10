@@ -31,15 +31,17 @@ const clientConfig = {
         use: [
           'style-loader',
           'css-loader',
-          //'postcss-loader',
           'sass-loader'
         ],
       },
       {
         test: /\.(svg|ttf|woff|png)$/,
-        use: [
-          'file-loader',
-        ],
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[path][name].[ext]',
+          },
+        },
       },
     ]
   },

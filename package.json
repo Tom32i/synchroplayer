@@ -2,12 +2,15 @@
   "name": "synchroplayer",
   "version": "1.0.0",
   "description": "Synchro video player",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Thomas Jarrand <thomas.jarrand@gmail.com> (https://thomas.jarrand.fr)",
   "license": "MIT",
+  "files": [
+    "build/",
+    "bin/"
+  ],
   "dependencies": {
     "@elao/container.js": "^3.0.1",
     "i18n-js": "^3.8.0",

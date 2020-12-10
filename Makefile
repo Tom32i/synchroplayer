@@ -5,9 +5,6 @@
 install:
 	npm install
 
-install@production:
-	npm install --no-progress --color=always
-
 ## Start watcher
 watch:
 	npx webpack --watch --mode=development
@@ -25,3 +22,7 @@ start-client:
 
 start-server:
 	node bin/server.js 8001
+
+# Publish package
+publish: build
+	npm publish . --access public
