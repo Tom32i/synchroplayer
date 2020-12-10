@@ -5,6 +5,9 @@ import I18n from 'i18n-js';
 import Socket from '@client/components/Socket';
 import Player from '@client/components/Player';
 import UserList from '@client/components/UserList';
+import Logo from '@client/components/Logo';
+import AboutButton from '@client/components/AboutButton';
+import AboutModal from '@client/components/AboutModal';
 import { leave } from '@client/store/room';
 
 class Room extends Component {
@@ -48,6 +51,11 @@ class Room extends Component {
                 <Socket room={id} />
                 {this.renderContent()}
                 <UserList />
+                <div className="top-bar">
+                    <Logo />
+                    <AboutButton />
+                </div>
+                <AboutModal />
             </div>
         );
     }

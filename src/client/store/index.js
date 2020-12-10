@@ -1,10 +1,10 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-// import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
+import navigation from '@client/navigation/store';
 import room from '@client/store/room';
 import player from '@client/store/player';
 import options from '@client/store/options';
-import navigation from '@client/navigation/store';
+import about from '@client/store/about';
 
 export default function create(logState = false) {
     const reducers = {
@@ -12,11 +12,10 @@ export default function create(logState = false) {
         player,
         options,
         navigation,
+        about,
     };
 
-    const middlewares = [
-        // thunkMiddleware
-    ];
+    const middlewares = [];
 
     if (logState) {
         middlewares.push(createLogger({ collapsed: true }));

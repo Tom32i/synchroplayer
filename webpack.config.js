@@ -36,7 +36,7 @@ const clientConfig = {
         ],
       },
       {
-        test: /\.(svg|ttf|woff)$/,
+        test: /\.(svg|ttf|woff|png)$/,
         use: [
           'file-loader',
         ],

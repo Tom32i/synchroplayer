@@ -86,7 +86,7 @@ export default class DropHandler {
                 }
         }
 
-        const extension = this.getExtention(name)
+        const extension = this.getExtention(name);
 
         switch (extension) {
             case 'srt':
