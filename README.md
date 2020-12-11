@@ -2,6 +2,8 @@
 
 Synchronized video player for watching videos together remotely.
 
+[![](header.png)](https://movie.tom32i.fr)
+
 Demo: https://movie.tom32i.fr
 
 ## Currently supported contents
