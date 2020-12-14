@@ -3,6 +3,12 @@ import Room from '@server/room/Room';
 export default class RoomManager {
     constructor() {
         this.rooms = new Map();
+
+        this.deleteRoom = this.deleteRoom.bind(this);
+    }
+
+    get length() {
+        return this.rooms.size;
     }
 
     findOrCreate(id) {
@@ -26,12 +32,22 @@ export default class RoomManager {
      * @return {Room}
      */
     createRoom(id) {
-        const room = new Room(id);
+        const room = new Room(id, this.deleteRoom);
 
         this.rooms.set(id, room);
 
         console.info(`Room ${id} created.`);
 
         return room;
+    }
+
+    deleteRoom(room) {
+        const { id } = room;
+
+        this.rooms.delete(id);
+
+        room.destroy();
+
+        console.info(`Room ${id} destroyed.`);
     }
 }

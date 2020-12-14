@@ -1,10 +1,13 @@
 import User from '@server/room/User';
 import Video from '@server/room/Video';
+import TimedEvent from '@server/core/TimedEvent';
 
 export default class Room {
-    constructor(id) {
+    constructor(id, onEmpty) {
         this.id = id;
+        this.onEmpty = onEmpty;
         this.users = new Map();
+        this.emptyResolver = new TimedEvent(this.checkEmpty.bind(this), 5000);
         this.video = null;
 
         this.addClient = this.addClient.bind(this);
@@ -82,6 +85,8 @@ export default class Room {
         if (this.video) {
             this.video.pause();
         }
+
+        this.emptyResolver.schedule();
     }
 
     sumUp(client, user) {
@@ -146,14 +151,17 @@ export default class Room {
         this.setVideo(new Video('youtube', data.url, data.name), client);
     }
 
-    setVideo(video, client) {
+    unloadVideo() {
         if (this.video) {
-            console.warn('Video already set');
             this.video.off('play', this.onVideoPlay);
             this.video.off('pause', this.onVideoPause);
             this.video.off('seek', this.onVideoSeek);
             this.video.off('stop', this.onVideoStop);
         }
+    }
+
+    setVideo(video, client) {
+        this.unloadVideo();
 
         video.on('play', this.onVideoPlay);
         video.on('pause', this.onVideoPause);
@@ -218,5 +226,25 @@ export default class Room {
                 client.send(name, data);
             }
         });
+    }
+
+    /**
+     * Check if room is empty
+     */
+    checkEmpty() {
+        if (this.users.size === 0) {
+            this.onEmpty(this);
+        }
+    }
+
+    /**
+     * Destroy room
+     */
+    destroy() {
+        this.unloadVideo();
+        this.emptyResolver.clear();
+        this.users.clear();
+        this.onEmpty = null;
+        this.video = null;
     }
 }

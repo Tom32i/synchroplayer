@@ -70,6 +70,15 @@ export default class Server extends NetcodeServer {
      * @param {Response} response
      */
     handleRequest(request, response) {
+        const { url } = request;
+
+        // Home info
+        if (url === '/') {
+            response.writeHead(200, { 'Content-Type': 'application/json' });
+
+            return response.end(JSON.stringify(this.getStatus()));
+        }
+
         // Anything else
         response.writeHead(404);
 
@@ -112,5 +121,17 @@ export default class Server extends NetcodeServer {
      */
     onError(error) {
         throw error;
+    }
+
+    /**
+     * Get status
+     *
+     * @return {Object}
+     */
+    getStatus() {
+        return {
+            rooms: this.rooms.length,
+            clients: this.clients.length,
+        };
     }
 }
