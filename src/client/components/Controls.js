@@ -13,6 +13,11 @@ class Controls extends Component {
         onStop: PropTypes.func.isRequired,
         onBackward: PropTypes.func.isRequired,
         onForward: PropTypes.func.isRequired,
+        onStream: PropTypes.func,
+    };
+
+    static defaultProps = {
+        onStream: null,
     };
 
     constructor(props) {
@@ -102,7 +107,7 @@ class Controls extends Component {
     }
 
     render() {
-        const { playing, loaded, onStop, onBackward, onForward } = this.props;
+        const { playing, loaded, onStop, onBackward, onForward, onStream } = this.props;
         const playIcon = loaded ? playing ? 'icon-pause' : 'icon-play' : 'icon-loader';
         const screenIcon = this.fullscreen ? 'icon-minimise' : 'icon-maximise';
 
@@ -110,6 +115,7 @@ class Controls extends Component {
             <div className="player-controls">
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-stop" />} onClick={onStop} />
+                    {onStream ? <Button disabled={!loaded} label="&#8682;" onClick={onStream} /> : null}
                 </div>
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-backward" onClick={onBackward} />} />

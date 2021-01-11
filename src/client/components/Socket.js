@@ -38,11 +38,15 @@ class Socket extends Component {
         super(props);
 
         this.api = get('api');
+        this.peer = get('peer');
 
         this.onError = this.onError.bind(this);
         this.onVideoFile = this.onVideoFile.bind(this);
         this.onVideoUrl = this.onVideoUrl.bind(this);
         this.onVideoYoutube = this.onVideoYoutube.bind(this);
+        this.onPeerOffer = this.onPeerOffer.bind(this);
+        this.onPeerAnswer = this.onPeerAnswer.bind(this);
+        this.onPeerCandidate = this.onPeerCandidate.bind(this);
     }
 
     componentDidMount() {
@@ -65,6 +69,9 @@ class Socket extends Component {
         this.api.addEventListener('video:file', this.onVideoFile);
         this.api.addEventListener('video:url', this.onVideoUrl);
         this.api.addEventListener('video:youtube', this.onVideoYoutube);
+        this.api.addEventListener('peer:offer', this.onPeerOffer);
+        this.api.addEventListener('peer:answer', this.onPeerAnswer);
+        this.api.addEventListener('peer:candidate', this.onPeerCandidate);
     }
 
     componentWillUnmount() {
@@ -85,6 +92,9 @@ class Socket extends Component {
         this.api.removeEventListener('video:file', this.onVideoFile);
         this.api.removeEventListener('video:url', this.onVideoUrl);
         this.api.removeEventListener('video:youtube', this.onVideoYoutube);
+        this.api.removeEventListener('peer:offer', this.onPeerOffer);
+        this.api.removeEventListener('peer:answer', this.onPeerAnswer);
+        this.api.removeEventListener('peer:candidate', this.onPeerCandidate);
 
         // Close connection
         this.api.leave();
@@ -121,6 +131,24 @@ class Socket extends Component {
         const { name } = event.detail;
 
         this.props.onVideo('file', name);
+    }
+
+    onPeerOffer(event) {
+        const description = event.detail;
+
+        this.peer.spectate(description);
+
+        this.props.onVideo('peer');
+    }
+
+    onPeerAnswer(event) {
+        const description = event.detail;
+        this.peer.distributor.answer(description);
+    }
+
+    onPeerCandidate(event) {
+        const candidate = JSON.parse(event.detail);
+        this.peer.candidate(candidate);
     }
 
     /**

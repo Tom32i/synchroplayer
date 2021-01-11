@@ -5,7 +5,7 @@ import RoomManager from '@server/room/RoomManager';
 
 export default class Server extends NetcodeServer {
     constructor(port = 8001, hostname = '0.0.0.0') {
-        super(port, hostname, new BinaryEncoder(events), 30, Math.pow(2, 12), undefined, false);
+        super(port, hostname, new BinaryEncoder(events), 30, Math.pow(2, 14), undefined, false);
 
         this.joinMatcher = new RegExp('^/([^/]+)/?$');
         this.rooms = new RoomManager();

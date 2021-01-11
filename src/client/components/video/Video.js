@@ -4,7 +4,7 @@ import Subtitles from '@client/components/Subtitles';
 
 export default class Video extends Component {
     static propTypes = {
-        src: PropTypes.string.isRequired,
+        src: PropTypes.string,
         playing: PropTypes.bool.isRequired,
         time: PropTypes.number.isRequired,
         authorized: PropTypes.bool.isRequired,
@@ -25,6 +25,7 @@ export default class Video extends Component {
 
     static defaultProps = {
         preload: 'auto',
+        src: null,
     };
 
     constructor(props) {
@@ -105,6 +106,18 @@ export default class Video extends Component {
         }
     }
 
+    captureStream() {
+        if (typeof this.element.mozCaptureStream === 'function') {
+            return this.element.mozCaptureStream();
+        }
+
+        if (typeof this.element.captureStream === 'function') {
+            return this.element.captureStream();
+        }
+
+        return null;
+    }
+
     onAuthorized() {
         if (!this.props.authorized) {
             this.props.setAuthorized(true);
@@ -157,7 +170,7 @@ export default class Video extends Component {
         return (
             <video
                 ref={this.setElement}
-                src={src}
+                src={src || undefined}
                 preload={preload}
                 onLoadStart={this.onLoadStart}
                 onProgress={this.props.onProgress}

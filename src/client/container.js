@@ -8,6 +8,7 @@ import Youtube from '@client/service/Youtube';
 import StoreWatcher from '@client/service/StoreWatcher';
 import Storage from '@client/service/Storage';
 import StorageListener from '@client/listener/StorageListener';
+import PeerManager from '@client/peer/PeerManager';
 
 const container = new Container();
 
@@ -31,6 +32,7 @@ container.registerService('api', Api, ['config:host', 'config:protocol']);
 container.registerService('youtube', Youtube, ['config:host']);
 container.registerService('watcher', StoreWatcher, ['store']);
 container.registerService('storage', Storage);
+container.registerService('peer', PeerManager, ['api']);
 
 // Listeners
 container.registerService('listener:storage', StorageListener, ['store', 'storage', 'config:debug']);
