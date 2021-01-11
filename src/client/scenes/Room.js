@@ -32,7 +32,7 @@ class Room extends Component {
     renderContent() {
         const { source, url, name } = this.props;
 
-        if (url) {
+        if (url || source === 'peer') {
             return <Player />;
         }
 

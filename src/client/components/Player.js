@@ -19,6 +19,7 @@ class Player extends Component {
         super(props);
 
         this.api = get('api');
+        this.peer = get('peer');
         this.showtime = new Showtime(props.setShowtime);
         this.video = null;
         this.timeline = null;
@@ -34,10 +35,25 @@ class Player extends Component {
         this.onBackward = this.onBackward.bind(this);
         this.onForward = this.onForward.bind(this);
         this.onSeek = this.onSeek.bind(this);
+        this.onStream = this.onStream.bind(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        const { source } = this.props;
+
+            console.log('componentDidUpdate', source);
+        if (source !== prevProps.source && source === 'peer') {
+            console.log(this.video);
+            this.peer.spectator.setVideo(this.video);
+        }
     }
 
     setVideo(video) {
         this.video = video;
+
+        if (this.peer.spectator) {
+            this.peer.spectator.setVideo(this.video);
+        }
     }
 
     setTimeline(timeline) {
@@ -87,6 +103,10 @@ class Player extends Component {
         this.api.seek(Math.min(this.video.currentTime + 10, this.video.duration));
     }
 
+    onStream() {
+        this.peer.distribute(this.video);
+    }
+
     render() {
         const { source } = this.props;
         const VideoComponent = source === 'youtube' ? YoutubeVideo : Video;
@@ -96,6 +116,7 @@ class Player extends Component {
                 <AuthorizationModal />
                 <VideoComponent
                     ref={this.setVideo}
+                    //srcObject={this.peer.spectator ? this.peer.spectator.stream : null}
                     onTimeUpdate={this.onTimeUpdate}
                     onDurationChange={this.onTimeUpdate}
                     onProgress={this.onProgress}
@@ -117,6 +138,7 @@ class Player extends Component {
                         onPause={this.onPause}
                         onBackward={this.onBackward}
                         onForward={this.onForward}
+                        onStream={source === 'file' ? this.onStream : undefined}
                     />
                 </div>
             </figure>

@@ -11,7 +11,8 @@
     },
     "room": {
         "drop_to_start": "Déposez un fichier vidéo ou un lien pour commencer !",
-        "drop_file": "Déposer le fichier \"{{name}}\" pour rejoindre"
+        "drop_file": "Déposer le fichier \"{{name}}\" pour rejoindre.",
+        "stream_file": "Initialisation du stream \"{{name}}\"."
     },
     "about": {
         "button": "À propos",
