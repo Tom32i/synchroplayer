@@ -62,4 +62,19 @@ export default class Api {
     loadVideo(source, name, url) {
         this.client.send(`video:${source}`, { url, name });
     }
+
+    offer(sdp) {
+        console.log('offer', sdp.length);
+        this.client.send('peer:offer', sdp);
+    }
+
+    answer(sdp) {
+        console.log('answer', sdp.length);
+        this.client.send('peer:answer', sdp);
+    }
+
+    newIceCandidate(candidate) {
+        console.log(JSON.stringify(candidate).length, candidate);
+        this.client.send('peer:candidate', JSON.stringify(candidate));
+    }
 }

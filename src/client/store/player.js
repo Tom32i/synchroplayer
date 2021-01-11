@@ -127,7 +127,6 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
                 name: payload.name,
                 type: payload.type,
                 source: payload.source,
@@ -141,7 +140,6 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
                 source: payload.source,
                 fromServer: false,
                 playing: false,
@@ -153,7 +151,6 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
                 name: payload.name,
                 type: payload.type,
                 source: payload.source,
@@ -167,8 +164,7 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
-                name: payload.name,
+                name: payload.name || state.name,
                 source: payload.source,
                 fromServer: true,
             };

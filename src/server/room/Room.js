@@ -9,6 +9,7 @@ export default class Room {
         this.users = new Map();
         this.emptyResolver = new TimedEvent(this.checkEmpty.bind(this), 5000);
         this.video = null;
+        this.distributor = null;
 
         this.addClient = this.addClient.bind(this);
         this.removeClient = this.removeClient.bind(this);
@@ -26,6 +27,9 @@ export default class Room {
         this.onVideoPause = this.onVideoPause.bind(this);
         this.onVideoSeek = this.onVideoSeek.bind(this);
         this.onVideoStop = this.onVideoStop.bind(this);
+        this.onPeerOffer = this.onPeerOffer.bind(this);
+        this.onPeerAnswer = this.onPeerAnswer.bind(this);
+        this.onPeerCandidate = this.onPeerCandidate.bind(this);
     }
 
     addClient(client) {
@@ -41,6 +45,9 @@ export default class Room {
         client.on('video:file', this.onClientVideoFile);
         client.on('video:url', this.onClientVideoUrl);
         client.on('video:youtube', this.onClientVideoYoutube);
+        client.on('peer:offer', this.onPeerOffer);
+        client.on('peer:answer', this.onPeerAnswer);
+        client.on('peer:candidate', this.onPeerCandidate);
     }
 
     removeClient(client) {
@@ -56,6 +63,9 @@ export default class Room {
         client.off('video:file', this.onClientVideoFile);
         client.off('video:url', this.onClientVideoUrl);
         client.off('video:youtube', this.onClientVideoYoutube);
+        client.off('peer:offer', this.onPeerOffer);
+        client.off('peer:answer', this.onPeerAnswer);
+        client.off('peer:candidate', this.onPeerCandidate);
     }
 
     createUser(client) {
@@ -84,6 +94,10 @@ export default class Room {
 
         if (this.video) {
             this.video.pause();
+        }
+
+        if (this.distributor === client) {
+            this.distributor = null;
         }
 
         this.emptyResolver.schedule();
@@ -149,6 +163,26 @@ export default class Room {
 
     onClientVideoYoutube(data, client) {
         this.setVideo(new Video('youtube', data.url, data.name), client);
+    }
+
+    onPeerOffer(sdp, client) {
+        if (!this.distributor) {
+            console.log('offer', sdp.length);
+            this.distributor = client;
+            this.sendToOther(client, 'peer:offer', sdp);
+        }
+    }
+
+    onPeerAnswer(sdp, client) {
+        if (this.distributor) {
+            console.log('answer', sdp.length);
+            this.distributor.send('peer:answer', sdp);
+        }
+    }
+
+    onPeerCandidate(candidate, client) {
+        console.log('candidate', candidate.length);
+        this.sendToOther(client, 'peer:candidate', candidate);
     }
 
     unloadVideo() {
