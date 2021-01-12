@@ -1,7 +1,7 @@
 export default class AbstractPeer {
     constructor(api) {
         this.api = api;
-        this.connection = new RTCPeerConnection(/* {
+        this.connection = new RTCPeerConnection({
             iceServers:[
                 {url:'stun:stun.l.google.com:19302'},
                 {url:'stun:stun1.l.google.com:19302'},
@@ -9,7 +9,7 @@ export default class AbstractPeer {
                 {url:'stun:stun3.l.google.com:19302'},
                 {url:'stun:stun4.l.google.com:19302'},
             ]
-        }*/);
+        });
 
         this.loadLocalDescription = this.loadLocalDescription.bind(this);
         this.onIceCandidate = this.onIceCandidate.bind(this);

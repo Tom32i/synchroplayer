@@ -115,7 +115,7 @@ class Controls extends Component {
             <div className="player-controls">
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-stop" />} onClick={onStop} />
-                    {onStream ? <Button disabled={!loaded} label="&#8682;" onClick={onStream} /> : null}
+                    {onStream ? <Button disabled={!loaded} label={<span className="icon-stream" />} onClick={onStream} /> : null}
                 </div>
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-backward" onClick={onBackward} />} />
