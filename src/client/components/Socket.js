@@ -134,21 +134,16 @@ class Socket extends Component {
     }
 
     onPeerOffer(event) {
-        const description = event.detail;
-
-        this.peer.spectate(description);
-
+        this.peer.spectate(JSON.parse(event.detail));
         this.props.onVideo('peer');
     }
 
     onPeerAnswer(event) {
-        const description = event.detail;
-        this.peer.distributor.answer(description);
+        this.peer.answer(JSON.parse(event.detail));
     }
 
     onPeerCandidate(event) {
-        const candidate = JSON.parse(event.detail);
-        this.peer.candidate(candidate);
+        this.peer.addCandidate(JSON.parse(event.detail));
     }
 
     /**
