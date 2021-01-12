@@ -24,3 +24,15 @@
 @import '@css/components/volume';
 @import '@css/components/youtube';
 @import '@css/components/shortcuts';
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#debug {
+    position: absolute;
+    top: 0;
+    right: 0;
+}

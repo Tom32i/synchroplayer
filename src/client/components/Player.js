@@ -39,11 +39,11 @@ class Player extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const { source } = this.props;
+        const { source } = this.props;
 
-            console.log('componentDidUpdate', source);
+        console.log('componentDidUpdate', source);
         if (source !== prevProps.source && source === 'peer') {
-            console.log(this.video);
+            console.log('source');
             this.peer.spectator.setVideo(this.video);
         }
     }

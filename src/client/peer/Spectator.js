@@ -38,8 +38,14 @@ export default class Spectator {
     }
 
     setVideo(video) {
-        console.log('setVideo', video);
-        this.video = video;
+        //console.log('setVideo', video);
+        //this.video = video;
+        const debug = document.createElement('video');
+        debug.id = 'debug';
+        debug.width = 160;
+        debug.height = 90;
+        document.body.appendChild(debug);
+        this.video = debug;
         this.playStreamOnVideo();
     }
 
@@ -54,14 +60,14 @@ export default class Spectator {
     }
 
     handleICECandidateEvent(event) {
-        console.log('handleICECandidateEvent', event);
+        console.log('handleICECandidateEvent');
         if (event.candidate) {
             this.api.newIceCandidate(event.candidate);
         };
     }
 
     handleTrackEvent(event) {
-        console.log('handleTrackEvent', event);
+        console.log('handleTrackEvent');
 
         if (!this.stream) {
             this.setStream(event.streams[0]);
@@ -69,19 +75,19 @@ export default class Spectator {
     }
 
     handleNegotiationNeededEvent(event) {
-        console.log('handleNegotiationNeededEvent', event);
+        console.log('handleNegotiationNeededEvent');
     }
     handleRemoveTrackEvent(event) {
-        console.log('handleRemoveTrackEvent', event);
+        console.log('handleRemoveTrackEvent');
     }
     handleICEConnectionStateChangeEvent(event) {
-        console.log('handleICEConnectionStateChangeEvent', event, this.connection.iceConnectionState);
+        console.log('handleICEConnectionStateChangeEvent', this.connection.iceConnectionState);
     }
     handleICEGatheringStateChangeEvent(event) {
-        console.log('handleICEGatheringStateChangeEvent', event);
+        console.log('handleICEGatheringStateChangeEvent');
     }
     handleSignalingStateChangeEvent(event) {
-        console.log('handleSignalingStateChangeEvent', event, this.connection.signalingState);
+        console.log('handleSignalingStateChangeEvent', this.connection.signalingState);
     }
 
     playStreamOnVideo() {

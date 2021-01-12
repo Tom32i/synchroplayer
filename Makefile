@@ -18,10 +18,10 @@ lint:
 	npx eslint src/* --ext .js,.json --fix
 
 start-client:
-	php -S 0.0.0.0:8000 -t build
+	php -S 0.0.0.0:8020 -t build
 
 start-server:
-	node bin/server.js 8001
+	node bin/server.js 8021
 
 # Publish package
 publish: build

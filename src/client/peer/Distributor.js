@@ -21,9 +21,32 @@ export default class Distributor {
     }
 
     load(video, success) {
-        const stream = video.captureStream();
+        //const stream = video.captureStream();
 
-        stream.getTracks().forEach(track => this.connection.addTrack(track, stream));
+        //stream.getTracks().forEach(track => this.connection.addTrack(track, stream));
+        //this.connection.addStream(stream);
+
+        const debug = document.createElement('video');
+        debug.id = 'debug';
+        debug.width = 160;
+        debug.height = 90;
+        document.body.appendChild(debug);
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 90;
+        document.body.appendChild(canvas);
+        const context = canvas.getContext('2d');
+        setInterval(() => {
+            context.fillStyle = context.fillStyle === '#0000ff' ? '#00ff00' : '#0000ff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }, 500);
+
+        const stream = canvas.captureStream(2);
+        this.connection.addStream(stream);
+
+        debug.autoplay = true;
+        debug.srcObject = stream;
+
 
         /*const mirror = document.createElement('video');
         mirror.className = 'mirror';
