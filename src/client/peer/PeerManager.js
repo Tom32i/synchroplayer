@@ -7,47 +7,36 @@ export default class PeerManager {
         this.api = api;
         this.distributor = null;
         this.spectator = null;
-
-        this.onOffer = this.onOffer.bind(this);
-        this.onAnswer = this.onAnswer.bind(this);
     }
 
     distribute(video) {
         this.ensureIsFree();
 
         this.distributor = new Distributor(this.api);
-        this.distributor.load(video, this.onOffer);
+        this.distributor.loadVideo(video);
     }
 
-    spectate(sdp) {
+    spectate(description) {
         this.ensureIsFree();
 
-        console.log('spectate', sdp.length);
-
         this.spectator = new Spectator(this.api);
-        this.spectator.load(sdp, this.onAnswer);
+
+        this.spectator.loadRemoteDescription(description);
+        this.spectator.answer();
     }
 
-    candidate(candidate) {
+    answer(description) {
+        this.distributor.loadRemoteDescription(description);
+    }
+
+    addCandidate(candidate) {
         if (this.distributor) {
-            return this.distributor.candidate(candidate);
+            return this.distributor.addCandidate(candidate);
         }
 
         if (this.spectator) {
-            return this.spectator.candidate(candidate);
+            return this.spectator.addCandidate(candidate);
         }
-    }
-
-    onOffer(localDescription) {
-        this.api.offer(localDescription.sdp);
-    }
-
-    onAnswer(localDescription) {
-        this.api.answer(localDescription.sdp);
-    }
-
-    onCandidate(candidate) {
-        this.api.answer(localDescription.sdp);
     }
 
     ensureIsFree() {

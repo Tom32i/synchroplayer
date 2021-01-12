@@ -165,23 +165,20 @@ export default class Room {
         this.setVideo(new Video('youtube', data.url, data.name), client);
     }
 
-    onPeerOffer(sdp, client) {
+    onPeerOffer(data, client) {
         if (!this.distributor) {
-            console.log('offer', sdp.length);
             this.distributor = client;
-            this.sendToOther(client, 'peer:offer', sdp);
+            this.sendToOther(client, 'peer:offer', data);
         }
     }
 
-    onPeerAnswer(sdp, client) {
+    onPeerAnswer(data/* , client*/) {
         if (this.distributor) {
-            console.log('answer', sdp.length);
-            this.distributor.send('peer:answer', sdp);
+            this.distributor.send('peer:answer', data);
         }
     }
 
     onPeerCandidate(candidate, client) {
-        console.log('candidate', candidate.length);
         this.sendToOther(client, 'peer:candidate', candidate);
     }
 

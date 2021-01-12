@@ -38,21 +38,11 @@ class Player extends Component {
         this.onStream = this.onStream.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
-        const { source } = this.props;
-
-            console.log('componentDidUpdate', source);
-        if (source !== prevProps.source && source === 'peer') {
-            console.log(this.video);
-            this.peer.spectator.setVideo(this.video);
-        }
-    }
-
     setVideo(video) {
         this.video = video;
 
         if (this.peer.spectator) {
-            this.peer.spectator.setVideo(this.video);
+            this.peer.spectator.setVideo(this.video.element);
         }
     }
 
@@ -107,16 +97,28 @@ class Player extends Component {
         this.peer.distribute(this.video);
     }
 
+    getVideoComponent(source) {
+        switch (source) {
+            case 'youtube':
+                return YoutubeVideo;
+
+                // case: 'peer':
+                //    return StreamVideo;
+
+            default:
+                return Video;
+        }
+    }
+
     render() {
         const { source } = this.props;
-        const VideoComponent = source === 'youtube' ? YoutubeVideo : Video;
+        const VideoComponent = this.getVideoComponent(source);
 
         return (
             <figure className="player">
                 <AuthorizationModal />
                 <VideoComponent
                     ref={this.setVideo}
-                    //srcObject={this.peer.spectator ? this.peer.spectator.stream : null}
                     onTimeUpdate={this.onTimeUpdate}
                     onDurationChange={this.onTimeUpdate}
                     onProgress={this.onProgress}
