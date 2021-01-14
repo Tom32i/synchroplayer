@@ -2,13 +2,18 @@ import AbstractPeer from '@client/peer/AbstractPeer';
 import DebugCanvas from '@client/debug/DebugCanvas';
 
 export default class Distributor extends AbstractPeer {
-    loadVideo(video) {
-        // const stream = new DebugCanvas().getStream();
-        const stream = video.captureStream();
+    constructor(target, iceServers) {
+        super(iceServers);
+
+        this.target = target;
+        this.stream = null;
 
         this.onLocalDescriptionLoaded = this.onLocalDescriptionLoaded.bind(this);
+    }
 
-        stream.getTracks().forEach(track => this.connection.addTrack(track, stream));
+    setStream(stream) {
+        this.stream = stream;
+        this.stream.getTracks().forEach(track => this.connection.addTrack(track, this.stream));
 
         this.connection.createOffer({ offerToReceiveAudio: 1, offerToReceiveVideo: 1 })
             .then(this.loadLocalDescription)
@@ -17,10 +22,22 @@ export default class Distributor extends AbstractPeer {
     }
 
     onLocalDescriptionLoaded() {
-        this.api.offer(this.connection.localDescription);
+        this.emit('offer', {
+            target: this.target,
+            description: this.connection.localDescription,
+        });
     }
 
-    onError(error) {
-        console.error(error);
+    clear() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => {
+                this.connection.removeTrack(track, this.stream);
+                track.stop();
+            });
+
+            this.stream = null;
+        }
+
+        super.close();
     }
 }

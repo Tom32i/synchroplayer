@@ -1,15 +1,10 @@
-export default class AbstractPeer {
-    constructor(api) {
-        this.api = api;
-        this.connection = new RTCPeerConnection({
-            iceServers:[
-                {url:'stun:stun.l.google.com:19302'},
-                {url:'stun:stun1.l.google.com:19302'},
-                {url:'stun:stun2.l.google.com:19302'},
-                {url:'stun:stun3.l.google.com:19302'},
-                {url:'stun:stun4.l.google.com:19302'},
-            ]
-        });
+import EventEmitter from 'tom32i-event-emitter.js';
+
+export default class AbstractPeer extends EventEmitter {
+    constructor(iceServers = undefined) {
+        super();
+
+        this.connection = new RTCPeerConnection({ iceServers });
 
         this.loadLocalDescription = this.loadLocalDescription.bind(this);
         this.onIceCandidate = this.onIceCandidate.bind(this);
@@ -31,6 +26,7 @@ export default class AbstractPeer {
     }
 
     loadRemoteDescription(data) {
+        console.log('loadRemoteDescription');
         const description = new RTCSessionDescription(data);
 
         this.connection.setRemoteDescription(description).catch(this.onError);
@@ -38,15 +34,31 @@ export default class AbstractPeer {
 
     onIceCandidate(event) {
         if (event.candidate) {
-            this.api.newIceCandidate(event.candidate);
+            this.emit('icecandidate', {
+                target: this.target,
+                description: event.candidate,
+            });
         }
     }
 
     onIceStateChange() {
-        console.log('onIceStateChange', this.connection.iceConnectionState);
+        const { iceConnectionState } = this.connection;
+
+        switch (iceConnectionState) {
+            case 'connected':
+                this.emit('ready');
+                break;
+
+            default:
+                console.info('ICE connection status: ', iceConnectionState);
+        }
     }
 
     onError(error) {
         console.error(error);
+    }
+
+    clear() {
+        this.connection.close();
     }
 }

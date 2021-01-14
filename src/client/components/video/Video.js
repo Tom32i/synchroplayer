@@ -44,7 +44,6 @@ export default class Video extends Component {
         this.onCanPlayThrough = this.onCanPlayThrough.bind(this);
         this.onDurationChange = this.onDurationChange.bind(this);
         this.onLoadedMetadata = this.onLoadedMetadata.bind(this);
-        this.onResize = this.onResize.bind(this);
         this.onNotAuthorized = this.onNotAuthorized.bind(this);
         this.onEnded = this.onEnded.bind(this);
         this.onAuthorized = this.onAuthorized.bind(this);
@@ -70,18 +69,11 @@ export default class Video extends Component {
         }
     }
 
-    componentWillUnmount() {
-        if (this.element) {
-            this.element.removeEventListener('resize', this.onResize);
-        }
-    }
-
     setElement(element) {
         this.element = element;
 
         if (this.element) {
             this.element.volume = this.props.volume;
-            this.element.addEventListener('resize', this.onResize);
         }
     }
 
@@ -120,41 +112,39 @@ export default class Video extends Component {
 
     captureStream() {
         if (typeof this.element.mozCaptureStream === 'function') {
-            console.log(this.element.readyState);
             return this.element.mozCaptureStream();
         }
 
         if (typeof this.element.captureStream === 'function') {
-            console.log(this.element.readyState);
             return this.element.captureStream();
         }
 
         return null;
     }
 
+    loadStream(stream) {
+        this.element.srcObject = stream;
+    }
+
     onAuthorized() {
-        console.log('onAuthorized');
         if (!this.props.authorized) {
             this.props.setAuthorized(true);
         }
     }
 
     onNotAuthorized(error) {
-        console.log('onNotAuthorized');
         if (error instanceof DOMException && error.name === 'NotAllowedError' && this.props.authorized) {
             this.props.setAuthorized(false);
         }
     }
 
     onLoadStart() {
-        console.log('onLoadStart');
         if (this.props.loaded) {
             this.props.setLoaded(false);
         }
     }
 
     onProgress() {
-        console.log('onProgress');
         this.props.onProgress();
     }
 
@@ -175,10 +165,6 @@ export default class Video extends Component {
 
     onLoadedMetadata(event) {
         console.log('onLoadedMetadata', event);
-    }
-
-    onResize(event) {
-        console.log('onResize', event);
     }
 
     onDurationChange() {

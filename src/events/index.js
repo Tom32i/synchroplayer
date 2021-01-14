@@ -5,6 +5,7 @@ import FileVideoCodec from '@events/FileVideoCodec';
 import UrlVideoCodec from '@events/UrlVideoCodec';
 import UserReadyCodec from '@events/UserReadyCodec';
 import SeekCodec from '@events/SeekCodec';
+import PeerCodec from '@events/PeerCodec';
 
 export default [
     ['user:me', new Int8Codec()],
@@ -19,7 +20,7 @@ export default [
     ['video:file', new FileVideoCodec()],
     ['video:url', new UrlVideoCodec()],
     ['video:youtube', new UrlVideoCodec()],
-    ['peer:offer', new LongStringCodec()],
-    ['peer:answer', new LongStringCodec()],
-    ['peer:candidate', new LongStringCodec()],
+    ['peer:offer', new PeerCodec()],
+    ['peer:answer', new PeerCodec()],
+    ['peer:candidate', new PeerCodec()],
 ];

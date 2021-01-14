@@ -134,16 +134,23 @@ class Socket extends Component {
     }
 
     onPeerOffer(event) {
-        this.peer.spectate(JSON.parse(event.detail));
+        console.log('onPeerOffer', event.detail);
+        const { sender, description } = event.detail;
+        this.peer.spectate(JSON.parse(description));
+        // this.props.onUserDistributor(sender);
         this.props.onVideo('peer');
     }
 
     onPeerAnswer(event) {
-        this.peer.answer(JSON.parse(event.detail));
+        console.log('onPeerAnswer', event.detail);
+        const { sender, description } = event.detail;
+        this.peer.answer(sender, JSON.parse(description));
     }
 
     onPeerCandidate(event) {
-        this.peer.addCandidate(JSON.parse(event.detail));
+        console.log('onPeerCandidate', event.detail);
+        const { sender, description } = event.detail;
+        this.peer.addCandidate(sender, JSON.parse(description));
     }
 
     /**
@@ -177,6 +184,7 @@ export default connect(
         onUserAdd: event => dispatch(userAdd(event.detail)),
         onUserRemove: event => dispatch(userRemove(event.detail)),
         onUserReady: event => dispatch(userReady(event.detail)),
+        // onUserDistributor: event => dispatch(userReady(event.detail)),
         onControlPlay: event => dispatch(play(event.detail)),
         onControlPause: event => dispatch(pause(event.detail)),
         onControlSeek: event => dispatch(seek(event.detail)),

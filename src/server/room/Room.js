@@ -167,19 +167,50 @@ export default class Room {
 
     onPeerOffer(data, client) {
         if (!this.distributor) {
+            console.log('set distributor', client.id);
             this.distributor = client;
-            this.sendToOther(client, 'peer:offer', data);
+        }
+
+        if (this.distributor === client) {
+            const target = this.getClientFromUserId(data.target);
+
+            if (!target) {
+                console.error('Invalid target');
+                return;
+            }
+
+            const user = this.users.get(client);
+            const { description } = data;
+
+            target.send('peer:offer', { description, sender: user.id });
         }
     }
 
-    onPeerAnswer(data/* , client*/) {
-        if (this.distributor) {
-            this.distributor.send('peer:answer', data);
+    onPeerAnswer(data, client) {
+        if (this.distributor && client !== this.distributor) {
+            const user = this.users.get(client);
+            const { description } = data;
+
+            this.distributor.send('peer:answer', { description, sender: user.id });
         }
     }
 
-    onPeerCandidate(candidate, client) {
-        this.sendToOther(client, 'peer:candidate', candidate);
+    onPeerCandidate(data, client) {
+        if (!this.distributor) {
+            return;
+        }
+
+        const target = this.getClientFromUserId(data.target);
+
+        if (!target) {
+            console.error('Invalid target');
+            return;
+        }
+
+        const user = this.users.get(client);
+        const { description } = data;
+
+        target.send('peer:candidate', { description, sender: user.id });
     }
 
     unloadVideo() {
@@ -232,6 +263,14 @@ export default class Room {
 
     onVideoStop() {
         this.send('control:stop');
+    }
+
+    getClientFromUserId(id) {
+        for (let [client, user] of this.users.entries()) {
+            if (user.id === id) {
+                return client;
+            }
+        }
     }
 
     /**
