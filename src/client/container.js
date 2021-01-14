@@ -20,6 +20,13 @@ const { hostname, port, protocol } = window.location;
 container.registerParameter('config:host', port ? `${hostname}:${parseInt(port, 10) + 1}` : `server.${hostname}`);
 container.registerParameter('config:protocol', protocol.replace('http', 'ws'));
 container.registerParameter('config:debug', process.env.NODE_ENV === 'development');
+container.registerParameter('config:ice-servers', [
+    {url:'stun:stun.l.google.com:19302'},
+    {url:'stun:stun1.l.google.com:19302'},
+    {url:'stun:stun2.l.google.com:19302'},
+    {url:'stun:stun3.l.google.com:19302'},
+    {url:'stun:stun4.l.google.com:19302'},
+]);
 
 // Redux store:
 container.registerCallback('store', createStore, ['config:debug']);
@@ -32,7 +39,7 @@ container.registerService('api', Api, ['config:host', 'config:protocol']);
 container.registerService('youtube', Youtube, ['config:host']);
 container.registerService('watcher', StoreWatcher, ['store']);
 container.registerService('storage', Storage);
-container.registerService('peer', PeerManager, ['api']);
+container.registerService('peer', PeerManager, ['api', 'store', 'config:ice-servers']);
 
 // Listeners
 container.registerService('listener:storage', StorageListener, ['store', 'storage', 'config:debug']);

@@ -2,17 +2,20 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
-import { setShowtime } from '@client/store/player';
+import { setShowtime, setStreaming } from '@client/store/player';
 import { Video, YoutubeVideo } from '@client/components/video';
 import Controls from '@client/components/Controls';
 import Timeline from '@client/components/Timeline';
 import AuthorizationModal from '@client/components/AuthorizationModal';
 import Showtime from '@client/common/Showtime';
+import DebugCanvas from '@client/debug/DebugCanvas';
 
 class Player extends Component {
     static propTypes = {
         source: PropTypes.string.isRequired,
+        streaming: PropTypes.bool.isRequired,
         setShowtime: PropTypes.func.isRequired,
+        setStreaming: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -36,14 +39,27 @@ class Player extends Component {
         this.onForward = this.onForward.bind(this);
         this.onSeek = this.onSeek.bind(this);
         this.onStream = this.onStream.bind(this);
+        this.toggleStream = this.toggleStream.bind(this);
+    }
+
+    componentDidMount() {
+        this.peer.addEventListener('stream', this.onStream);
+    }
+
+    componentWillUnmount() {
+        this.peer.removeEventListener('stream', this.onStream);
+    }
+
+    componentDidUpdate(prevProps) {
+        const { source, streaming } = this.props;
+
+        if (source !== prevProps.source && prevProps.source === 'peer') {
+            this.peer.clear();
+        }
     }
 
     setVideo(video) {
         this.video = video;
-
-        if (this.peer.spectator) {
-            this.peer.spectator.setVideo(this.video.element);
-        }
     }
 
     setTimeline(timeline) {
@@ -94,16 +110,24 @@ class Player extends Component {
     }
 
     onStream() {
-        this.peer.distribute(this.video);
+        this.video.loadStream(this.peer.spectator.stream);
+    }
+
+    toggleStream(streaming) {
+        if (streaming) {
+            this.peer.distribute(
+                // this.video.captureStream()
+                new DebugCanvas().getStream()
+            );
+        } else {
+            this.peer.clear();
+        }
     }
 
     getVideoComponent(source) {
         switch (source) {
             case 'youtube':
                 return YoutubeVideo;
-
-                // case: 'peer':
-                //    return StreamVideo;
 
             default:
                 return Video;
@@ -140,7 +164,7 @@ class Player extends Component {
                         onPause={this.onPause}
                         onBackward={this.onBackward}
                         onForward={this.onForward}
-                        onStream={source === 'file' ? this.onStream : undefined}
+                        toggleStream={source === 'file' ? this.toggleStream : undefined}
                     />
                 </div>
             </figure>
@@ -151,8 +175,10 @@ class Player extends Component {
 export default connect(
     state => ({
         source: state.player.source,
+        streaming: state.player.streaming,
     }),
     dispatch => ({
         setShowtime: showtime => dispatch(setShowtime(showtime)),
+        setStreaming: streming => dispatch(setStreaming(streming)),
     })
 )(Player);

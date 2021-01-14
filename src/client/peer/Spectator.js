@@ -1,20 +1,15 @@
 import AbstractPeer from '@client/peer/AbstractPeer';
 
 export default class Spectator extends AbstractPeer {
-    constructor(api) {
-        super(api);
+    constructor(iceServers) {
+        super(iceServers);
 
         this.stream = null;
-        this.video = null;
 
         this.onTrack = this.onTrack.bind(this);
         this.onLocalDescriptionLoaded = this.onLocalDescriptionLoaded.bind(this);
 
         this.connection.addEventListener('track', this.onTrack);
-        // this.connection.addEventListener('negotiationneeded', this.handleNegotiationNeededEvent.bind(this));
-        // this.connection.addEventListener('removetrack', this.handleRemoveTrackEvent.bind(this));
-        // this.connection.addEventListener('icegatheringstatechange', this.handleICEGatheringStateChangeEvent.bind(this));
-        // this.connection.addEventListener('signalingstatechange', this.handleSignalingStateChangeEvent.bind(this));
     }
 
     answer() {
@@ -24,30 +19,23 @@ export default class Spectator extends AbstractPeer {
             .catch(this.onError);
     }
 
-    setVideo(video) {
-        this.video = video;
-
-        this.playStreamOnVideo();
-    }
-
-    setStream(stream) {
-        this.stream = stream;
-        this.playStreamOnVideo();
-    }
-
     onLocalDescriptionLoaded() {
-        this.api.answer(this.connection.localDescription);
+        this.emit('answer', { description: this.connection.localDescription });
     }
 
     onTrack(event) {
         if (!this.stream) {
-            this.setStream(event.streams[0]);
+            this.stream = event.streams[0];
+            this.emit('stream');
         }
     }
 
-    playStreamOnVideo() {
-        if (!!this.video && !!this.stream) {
-            this.video.srcObject = this.stream;
+    clear() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
         }
+
+        super.close();
     }
 }

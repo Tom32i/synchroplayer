@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '@client/components/Button';
 import VolumeControl from '@client/components/VolumeControl';
+import StreamButton from '@client/components/StreamButton';
 
 class Controls extends Component {
     static propTypes = {
@@ -13,11 +14,12 @@ class Controls extends Component {
         onStop: PropTypes.func.isRequired,
         onBackward: PropTypes.func.isRequired,
         onForward: PropTypes.func.isRequired,
-        onStream: PropTypes.func,
+        toggleStream: PropTypes.func,
+        streamable: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
-        onStream: null,
+        toggleStream: null,
     };
 
     constructor(props) {
@@ -107,7 +109,7 @@ class Controls extends Component {
     }
 
     render() {
-        const { playing, loaded, onStop, onBackward, onForward, onStream } = this.props;
+        const { playing, loaded, streamable, onStop, onBackward, onForward, toggleStream } = this.props;
         const playIcon = loaded ? playing ? 'icon-pause' : 'icon-play' : 'icon-loader';
         const screenIcon = this.fullscreen ? 'icon-minimise' : 'icon-maximise';
 
@@ -115,7 +117,7 @@ class Controls extends Component {
             <div className="player-controls">
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-stop" />} onClick={onStop} />
-                    {onStream ? <Button disabled={!loaded} label={<span className="icon-stream" />} onClick={onStream} /> : null}
+                    {streamable ? <StreamButton disabled={!loaded} toggleStream={toggleStream} /> : null}
                 </div>
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-backward" onClick={onBackward} />} />
@@ -135,5 +137,6 @@ export default connect(
     state => ({
         playing: state.player.playing,
         loaded: state.player.loaded,
-    })
+        streamable: state.player.source === 'file',
+    }),
 )(Controls);
