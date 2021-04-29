@@ -2,20 +2,25 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
-import { setShowtime, setStreaming } from '@client/store/player';
+import { setShowtime, setTimeline } from '@client/store/player';
 import { Video, YoutubeVideo } from '@client/components/video';
 import Controls from '@client/components/Controls';
 import Timeline from '@client/components/Timeline';
 import AuthorizationModal from '@client/components/AuthorizationModal';
 import Showtime from '@client/common/Showtime';
-import DebugCanvas from '@client/debug/DebugCanvas';
 
 class Player extends Component {
     static propTypes = {
         source: PropTypes.string.isRequired,
-        streaming: PropTypes.bool.isRequired,
         setShowtime: PropTypes.func.isRequired,
-        setStreaming: PropTypes.func.isRequired,
+        setTimeline: PropTypes.func.isRequired,
+        duration: PropTypes.number,
+        currentTime: PropTypes.number,
+    };
+
+    static defaultProps = {
+        duration: 0,
+        currentTime: 0,
     };
 
     constructor(props) {
@@ -42,6 +47,22 @@ class Player extends Component {
         this.toggleStream = this.toggleStream.bind(this);
     }
 
+    get duration() {
+        if (this.props.source === 'peer') {
+            return this.props.duration;
+        }
+
+        return this.video.duration;
+    }
+
+    get currentTime() {
+        if (this.props.source === 'peer') {
+            return this.props.currentTime;
+        }
+
+        return this.video.currentTime;
+    }
+
     componentDidMount() {
         this.peer.addEventListener('stream', this.onStream);
     }
@@ -51,7 +72,7 @@ class Player extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const { source, streaming } = this.props;
+        const { source } = this.props;
 
         if (source !== prevProps.source && prevProps.source === 'peer') {
             this.peer.clear();
@@ -68,12 +89,18 @@ class Player extends Component {
 
     onTimeUpdate() {
         if (this.timeline) {
-            this.timeline.setTime(this.video.currentTime, this.video.duration);
+            if (this.props.source !== 'peer') {
+                this.props.setTimeline(this.video.currentTime, this.video.duration);
+            }
+
+            if (this.peer.isStreaming()) {
+                this.api.setTimeline(this.video.currentTime, this.video.duration);
+            }
         }
     }
 
     onProgress() {
-        if (this.timeline) {
+        if (this.timeline && this.props.source !== 'peer') {
             this.timeline.setLoadedParts(this.video.buffered, this.video.duration);
         }
     }
@@ -85,16 +112,16 @@ class Player extends Component {
 
     onSeek(progress) {
         if (typeof progress === 'number' && !isNaN(progress)) {
-            this.api.seek(progress * this.video.duration);
+            this.api.seek(progress * this.duration);
         }
     }
 
     onPlay() {
-        this.api.play(this.video.currentTime);
+        this.api.play(this.currentTime);
     }
 
     onPause() {
-        this.api.pause(this.video.currentTime);
+        this.api.pause(this.currentTime);
     }
 
     onStop() {
@@ -102,23 +129,21 @@ class Player extends Component {
     }
 
     onBackward() {
-        this.api.seek(Math.max(this.video.currentTime - 10, 0));
+        this.api.seek(Math.max(this.currentTime - 10, 0));
     }
 
     onForward() {
-        this.api.seek(Math.min(this.video.currentTime + 10, this.video.duration));
+        this.api.seek(Math.min(this.currentTime + 10, this.duration));
     }
 
     onStream() {
         this.video.loadStream(this.peer.spectator.stream);
     }
 
-    toggleStream(streaming) {
-        if (streaming) {
-            this.peer.distribute(
-                // this.video.captureStream()
-                new DebugCanvas().getStream()
-            );
+    toggleStream() {
+        if (!this.peer.isStreaming()) {
+            this.peer.distribute(this.video.captureStream());
+            this.api.setTimeline(this.video.currentTime, this.video.duration);
         } else {
             this.peer.clear();
         }
@@ -175,10 +200,11 @@ class Player extends Component {
 export default connect(
     state => ({
         source: state.player.source,
-        streaming: state.player.streaming,
+        duration: state.player.duration,
+        currentTime: state.player.currentTime,
     }),
     dispatch => ({
         setShowtime: showtime => dispatch(setShowtime(showtime)),
-        setStreaming: streming => dispatch(setStreaming(streming)),
+        setTimeline: (currentTime, duration) => dispatch(setTimeline(currentTime, duration)),
     })
 )(Player);

@@ -1,8 +1,7 @@
 import AbstractPeer from '@client/peer/AbstractPeer';
-import DebugCanvas from '@client/debug/DebugCanvas';
 
 export default class Distributor extends AbstractPeer {
-    constructor(target, iceServers) {
+    constructor(target, iceServers = undefined) {
         super(iceServers);
 
         this.target = target;

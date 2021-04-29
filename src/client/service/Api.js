@@ -59,23 +59,23 @@ export default class Api {
         this.client.send('user:ready', { id: 0, ready });
     }
 
+    setTimeline(currentTime, duration) {
+        this.client.send('peer:timeline', { currentTime, duration });
+    }
+
     loadVideo(source, name, url) {
         this.client.send(`video:${source}`, { url, name });
     }
 
     offer(description, target) {
-        console.log('offer', description, target);
         this.client.send('peer:offer', { target, description: JSON.stringify(description.toJSON()) });
     }
 
     answer(description) {
-        console.log('answer', description);
         this.client.send('peer:answer', { description: JSON.stringify(description.toJSON()) });
     }
 
     newIceCandidate(description, target) {
-        console.log('newIceCandidate', description, target);
-
         this.client.send('peer:candidate', { target, description: JSON.stringify(description.toJSON()) });
     }
 }

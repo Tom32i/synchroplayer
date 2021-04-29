@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '@client/components/Button';
-import { setStreaming } from '@client/store/player';
 
 class StreamButton extends Component {
     static propTypes = {
@@ -41,10 +40,7 @@ class StreamButton extends Component {
 
 export default connect(
     state => ({
-        streaming: state.player.streaming,
+        streaming: state.room.streaming === state.room.me,
     }),
-    /* dispatch => ({
-        toggleStream: streaming => dispatch(setStreaming(streaming)),
-    })*/
 )(StreamButton);
 

@@ -1,3 +1,4 @@
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const resolve = {
@@ -9,12 +10,12 @@ const resolve = {
   }
 };
 
-const clientConfig = {
+const clientConfig = env => ({
   target: 'web',
   entry: './src/client/index.js',
   output: {
     filename: 'client.js',
-    path: `${__dirname}/build`,
+    path: path.resolve(__dirname, env.root || '.', 'build'),
   },
   module: {
     rules: [
@@ -49,14 +50,14 @@ const clientConfig = {
   plugins: [
     new HtmlWebpackPlugin({ template: './index.html' })
   ]
-};
+});
 
-const serverConfig = {
+const serverConfig = env => ({
   target: 'node',
   entry: './src/server/index.js',
   output: {
     filename: 'server.js',
-    path: `${__dirname}/bin`,
+    path: path.resolve(__dirname, env.root || '.', 'bin'),
   },
   module: {
     rules: [
@@ -73,6 +74,6 @@ const serverConfig = {
     ]
   },
   resolve,
-};
+});
 
-module.exports = [ serverConfig, clientConfig ];
+module.exports = env => [ serverConfig(env), clientConfig(env) ];

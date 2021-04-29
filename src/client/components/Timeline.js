@@ -1,10 +1,36 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-export default class Timeline extends Component {
+class Timeline extends Component {
     static propTypes = {
         onSeek: PropTypes.func.isRequired,
+        played: PropTypes.string,
+        time: PropTypes.string,
+        duration: PropTypes.string,
     };
+
+    static defaultProps = {
+        time: '',
+        duration: '',
+        played: '',
+    };
+
+    static formatPercent(time, duration) {
+        return (time / duration * 100).toFixed(3);
+    }
+
+    static formatTime(time) {
+        const hours = Math.floor(time / 3600);
+        const minutes = Math.floor(time / 60) % 60;
+        const seconds = time % 60;
+
+        if (hours) {
+            return `${hours}:${minutes.toFixed(0).padStart(2, 0)}:${seconds.toFixed(0).padStart(2, 0)}`;
+        }
+
+        return `${minutes}:${seconds.toFixed(0).padStart(2, 0)}`;
+    }
 
     constructor(props) {
         super(props);
@@ -12,10 +38,7 @@ export default class Timeline extends Component {
         this.container = null;
 
         this.state = {
-            time: '',
-            duration: '',
             loaded: [],
-            played: 0,
         };
 
         this.setContainer = this.setContainer.bind(this);
@@ -27,42 +50,24 @@ export default class Timeline extends Component {
         this.container = container;
     }
 
-    setTime(time, duration) {
-        this.setState({
-            played: this.formetPercent(time, duration),
-            time: this.formatTime(time),
-            duration: this.formatTime(duration),
-        });
-    }
-
     setLoadedParts(buffered, duration) {
         const { length } = buffered;
+
+        // Is streaming?
+        if (duration === Infinity || length === 0) {
+            return;
+        }
+
         const parts = new Array(length);
 
         for (let i = 0; i < length; i++) {
             parts[i] = [
-                this.formetPercent(buffered.start(i), duration),
-                this.formetPercent(buffered.end(i), duration)
+                this.constructor.formatPercent(buffered.start(i), duration),
+                this.constructor.formatPercent(buffered.end(i), duration)
             ];
         }
 
         this.setState({ loaded: parts });
-    }
-
-    formetPercent(time, duration) {
-        return (time / duration * 100).toFixed(3);
-    }
-
-    formatTime(time) {
-        const hours = Math.floor(time / 3600);
-        const minutes = Math.floor(time / 60) % 60;
-        const seconds = time % 60;
-
-        if (hours) {
-            return `${hours}:${minutes.toFixed(0).padStart(2, 0)}:${seconds.toFixed(0).padStart(2, 0)}`;
-        }
-
-        return `${minutes}:${seconds.toFixed(0).padStart(2, 0)}`;
     }
 
     onMouseDown(event) {
@@ -80,7 +85,8 @@ export default class Timeline extends Component {
     }
 
     render() {
-        const { played, loaded, time, duration } = this.state;
+        const { played, time, duration } = this.props;
+        const { loaded } = this.state;
 
         return (
             <div className="player-timeline">
@@ -96,3 +102,14 @@ export default class Timeline extends Component {
         );
     }
 }
+
+export default connect(
+    state => ({
+        played: Timeline.formatPercent(state.player.currentTime, state.player.duration),
+        time: Timeline.formatTime(state.player.currentTime),
+        duration: Timeline.formatTime(state.player.duration),
+    }),
+    null,
+    null,
+    { forwardRef: true }
+)(Timeline);

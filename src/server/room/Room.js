@@ -30,6 +30,7 @@ export default class Room {
         this.onPeerOffer = this.onPeerOffer.bind(this);
         this.onPeerAnswer = this.onPeerAnswer.bind(this);
         this.onPeerCandidate = this.onPeerCandidate.bind(this);
+        this.onPeerTimeline = this.onPeerTimeline.bind(this);
     }
 
     addClient(client) {
@@ -48,6 +49,7 @@ export default class Room {
         client.on('peer:offer', this.onPeerOffer);
         client.on('peer:answer', this.onPeerAnswer);
         client.on('peer:candidate', this.onPeerCandidate);
+        client.on('peer:timeline', this.onPeerTimeline);
     }
 
     removeClient(client) {
@@ -66,13 +68,11 @@ export default class Room {
         client.off('peer:offer', this.onPeerOffer);
         client.off('peer:answer', this.onPeerAnswer);
         client.off('peer:candidate', this.onPeerCandidate);
+        client.off('peer:timeline', this.onPeerTimeline);
     }
 
     createUser(client) {
         const user = new User(client.id);
-
-        this.send('user:add', user.id);
-        this.sumUp(client, user);
 
         this.users.set(client, user);
 
@@ -81,6 +81,33 @@ export default class Room {
         if (this.video) {
             this.video.pause();
         }
+
+        // Send me my id.
+        client.send('user:me', user.id);
+
+        this.users.forEach((otherUser, otherClient) => {
+            if (user !== otherUser) {
+                // Tell other user that I'm here.
+                otherClient.send('user:add', user.id);
+
+                // Send me other user state.
+                client.send('user:add', otherUser.id);
+                client.send('user:ready', otherUser);
+
+                if (otherClient === this.distributor) {
+                    // Send me current distributor
+                    client.send('user:streaming', otherUser.id);
+                    client.send('peer:timeline', this.video.getTimeLine());
+                }
+            }
+        });
+
+        if (this.video) {
+            const { source, url, name } = this.video;
+
+            client.send(`video:${source}`, { url, name });
+            client.send('control:seek', this.video.currentTime);
+        }
     }
 
     removeUser(client) {
@@ -88,7 +115,7 @@ export default class Room {
 
         this.users.delete(client);
 
-        this.send('user:remove', user.id);
+        this.sendToAll('user:remove', user.id);
 
         user.off('ready', this.onUserReady);
 
@@ -98,25 +125,10 @@ export default class Room {
 
         if (this.distributor === client) {
             this.distributor = null;
+            this.sendToAll('user:streaming', 0);
         }
 
         this.emptyResolver.schedule();
-    }
-
-    sumUp(client, user) {
-        client.send('user:me', user.id);
-
-        this.users.forEach(user => {
-            client.send('user:add', user.id);
-            client.send('user:ready', user);
-        });
-
-        if (this.video) {
-            const { source, url, name } = this.video;
-
-            client.send(`video:${source}`, { url, name });
-            client.send('control:seek', this.video.currentTime);
-        }
     }
 
     onClientReady(data, client) {
@@ -166,9 +178,14 @@ export default class Room {
     }
 
     onPeerOffer(data, client) {
+        const user = this.users.get(client);
+
         if (!this.distributor) {
-            console.log('set distributor', client.id);
             this.distributor = client;
+
+            this.sendToAll('user:streaming', user.id);
+
+            console.info('Client %d is distributor.', this.distributor.id);
         }
 
         if (this.distributor === client) {
@@ -179,7 +196,6 @@ export default class Room {
                 return;
             }
 
-            const user = this.users.get(client);
             const { description } = data;
 
             target.send('peer:offer', { description, sender: user.id });
@@ -192,6 +208,8 @@ export default class Room {
             const { description } = data;
 
             this.distributor.send('peer:answer', { description, sender: user.id });
+
+            client.send('peer:timeline', this.video.getTimeLine());
         }
     }
 
@@ -213,6 +231,18 @@ export default class Room {
         target.send('peer:candidate', { description, sender: user.id });
     }
 
+    onPeerTimeline(data, client) {
+        if (!this.video || !this.distributor || client !== this.distributor) {
+            return;
+        }
+
+        const { currentTime, duration } = data;
+
+        this.video.setTimeline(currentTime, duration);
+
+        this.sendToOthers(this.distributor, 'peer:timeline', data);
+    }
+
     unloadVideo() {
         if (this.video) {
             this.video.off('play', this.onVideoPlay);
@@ -232,7 +262,7 @@ export default class Room {
 
         const { source, url, name } = video;
 
-        this.sendToOther(client, `video:${source}`, { url, name });
+        this.sendToOthers(client, `video:${source}`, { url, name });
 
         this.video = video;
 
@@ -242,7 +272,7 @@ export default class Room {
     onUserReady(event) {
         const user = event.detail;
 
-        this.send('user:ready', user);
+        this.sendToAll('user:ready', user);
 
         if (!user.ready) {
             this.video.pause();
@@ -250,19 +280,19 @@ export default class Room {
     }
 
     onVideoPlay() {
-        this.send('control:play', this.video.time);
+        this.sendToAll('control:play', this.video.currentTime);
     }
 
     onVideoPause() {
-        this.send('control:pause', this.video.time);
+        this.sendToAll('control:pause', this.video.currentTime);
     }
 
     onVideoSeek() {
-        this.send('control:seek', this.video.time);
+        this.sendToAll('control:seek', this.video.currentTime);
     }
 
     onVideoStop() {
-        this.send('control:stop');
+        this.sendToAll('control:stop');
     }
 
     getClientFromUserId(id) {
@@ -279,7 +309,7 @@ export default class Room {
      * @param {String} name
      * @param {Object} data
      */
-    send(name, data = undefined) {
+    sendToAll(name, data = undefined) {
         this.users.forEach((user, client) => client.send(name, data));
     }
 
@@ -290,9 +320,9 @@ export default class Room {
      * @param {String} name
      * @param {Object} data
      */
-    sendToOther(target, name, data = undefined) {
+    sendToOthers(target, name, data = undefined) {
         this.users.forEach((user, client) => {
-            if (user !== target && target !== client) {
+            if (user !== target && client !== target) {
                 client.send(name, data);
             }
         });
