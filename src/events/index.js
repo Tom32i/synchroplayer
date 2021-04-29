@@ -25,4 +25,5 @@ export default [
     ['peer:answer', new PeerCodec()],
     ['peer:candidate', new PeerCodec()],
     ['peer:timeline', new PeerTimelineCodec()],
+    ['peer:stop', new Codec()],
 ];

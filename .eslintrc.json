@@ -27,7 +27,8 @@
         }
     },
     "globals": {
-        "YT": "readonly"
+        "YT": "readonly",
+        "ICE_SERVERS": "readonly"
     },
     "rules": {
         "indent": [

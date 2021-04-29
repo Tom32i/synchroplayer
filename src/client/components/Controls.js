@@ -117,7 +117,7 @@ class Controls extends Component {
             <div className="player-controls">
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-stop" />} onClick={onStop} />
-                    {streamable ? <StreamButton disabled={!loaded} toggleStream={toggleStream} /> : null}
+                    {streamable ? <StreamButton disabled={!loaded} onClick={toggleStream} /> : null}
                 </div>
                 <div className="group">
                     <Button disabled={!loaded} label={<span className="icon-backward" onClick={onBackward} />} />

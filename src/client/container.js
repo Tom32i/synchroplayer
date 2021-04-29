@@ -21,14 +21,7 @@ const { hostname, port, protocol } = window.location;
 container.registerParameter('config:host', port ? `${hostname}:${parseInt(port, 10) + 1}` : `server.${hostname}`);
 container.registerParameter('config:protocol', protocol.replace('http', 'ws'));
 container.registerParameter('config:debug', process.env.NODE_ENV === 'development');
-container.registerParameter('config:ice-servers', undefined);
-/* container.registerParameter('config:ice-servers', [
-    {url:'stun:stun.l.google.com:19302'},
-    {url:'stun:stun1.l.google.com:19302'},
-    {url:'stun:stun2.l.google.com:19302'},
-    {url:'stun:stun3.l.google.com:19302'},
-    {url:'stun:stun4.l.google.com:19302'},
-]);*/
+container.registerParameter('config:ice-servers', ICE_SERVERS);
 
 // Redux store:
 container.registerCallback('store', createStore, ['config:debug']);

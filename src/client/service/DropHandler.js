@@ -69,21 +69,17 @@ export default class DropHandler {
             case 'video/webm':
             case 'video/mp4':
             case 'video/quicktime':
+            case 'video/x-matroska':
                 this.handleVideo(file);
-                break;
+                return;
 
             case 'text/vtt':
                 this.handleSubtitle(file);
-                break;
+                return;
 
             case 'text/srt':
                 this.handleSrtSubtitle(file);
-                break;
-
-            default:
-                if (type) {
-                    console.info(`File type "${type}" not supported.`);
-                }
+                return;
         }
 
         const extension = this.getExtention(name);
@@ -91,25 +87,26 @@ export default class DropHandler {
         switch (extension) {
             case 'srt':
                 this.handleSrtSubtitle(file);
-                break;
+                return;
 
             case 'vtt':
                 this.handleSubtitle(file);
-                break;
+                return;
 
             case 'mkv':
+            case 'mp4':
+            case 'avi':
                 this.handleVideo(file);
-                break;
-
-            default:
-                console.info(`File extension "${extension}" not supported.`);
+                return;
         }
+
+        console.info(`File type "${type}" with extension "${extension}" not supported.`);
     }
 
     handleVideo(file) {
         const { player } = this.store.getState();
         const isFileFromServer = player.source === 'file' && player.fromServer;
-        const action = isFileFromServer ? completeVideoFromFile : loadVideoFromFile;
+        const action = isFileFromServer && file.name === player.name ? completeVideoFromFile : loadVideoFromFile;
 
         this.store.dispatch(
             action(URL.createObjectURL(file), file.name, file.size, file.type)

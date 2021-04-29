@@ -31,6 +31,7 @@ export default class Room {
         this.onPeerAnswer = this.onPeerAnswer.bind(this);
         this.onPeerCandidate = this.onPeerCandidate.bind(this);
         this.onPeerTimeline = this.onPeerTimeline.bind(this);
+        this.onPeerStop = this.onPeerStop.bind(this);
     }
 
     addClient(client) {
@@ -50,6 +51,7 @@ export default class Room {
         client.on('peer:answer', this.onPeerAnswer);
         client.on('peer:candidate', this.onPeerCandidate);
         client.on('peer:timeline', this.onPeerTimeline);
+        client.on('peer:stop', this.onPeerStop);
     }
 
     removeClient(client) {
@@ -69,26 +71,32 @@ export default class Room {
         client.off('peer:answer', this.onPeerAnswer);
         client.off('peer:candidate', this.onPeerCandidate);
         client.off('peer:timeline', this.onPeerTimeline);
+        client.off('peer:stop', this.onPeerStop);
     }
 
     createUser(client) {
+        if (this.video) {
+            this.video.pause();
+        }
+
         const user = new User(client.id);
 
         this.users.set(client, user);
 
         user.on('ready', this.onUserReady);
 
-        if (this.video) {
-            this.video.pause();
-        }
-
         // Send me my id.
         client.send('user:me', user.id);
 
+        if (this.video) {
+            const { source, url, name } = this.video;
+
+            client.send(`video:${source}`, { url, name });
+            client.send('control:seek', this.video.currentTime);
+        }
+
         this.users.forEach((otherUser, otherClient) => {
             if (user !== otherUser) {
-                // Tell other user that I'm here.
-                otherClient.send('user:add', user.id);
 
                 // Send me other user state.
                 client.send('user:add', otherUser.id);
@@ -99,15 +107,11 @@ export default class Room {
                     client.send('user:streaming', otherUser.id);
                     client.send('peer:timeline', this.video.getTimeLine());
                 }
+
+                // Tell other user that I'm here.
+                otherClient.send('user:add', user.id);
             }
         });
-
-        if (this.video) {
-            const { source, url, name } = this.video;
-
-            client.send(`video:${source}`, { url, name });
-            client.send('control:seek', this.video.currentTime);
-        }
     }
 
     removeUser(client) {
@@ -124,8 +128,7 @@ export default class Room {
         }
 
         if (this.distributor === client) {
-            this.distributor = null;
-            this.sendToAll('user:streaming', 0);
+            this.onPeerStop(null, client);
         }
 
         this.emptyResolver.schedule();
@@ -243,6 +246,19 @@ export default class Room {
         this.sendToOthers(this.distributor, 'peer:timeline', data);
     }
 
+    onPeerStop(data, client) {
+        if (this.distributor === client) {
+            this.distributor = null;
+            this.video.setTimeline(0, 0);
+
+            this.sendToAll('user:streaming', 0);
+            this.sendToAll('peer:timeline', this.video.getTimeLine());
+            this.sendToOthers(client, 'peer:stop');
+
+            console.info('Streaming stoped.');
+        }
+    }
+
     unloadVideo() {
         if (this.video) {
             this.video.off('play', this.onVideoPlay);
@@ -260,11 +276,11 @@ export default class Room {
         video.on('seek', this.onVideoSeek);
         video.on('stop', this.onVideoStop);
 
+        this.video = video;
+
         const { source, url, name } = video;
 
         this.sendToOthers(client, `video:${source}`, { url, name });
-
-        this.video = video;
 
         console.info('Loaded video:', source, url, name);
     }
