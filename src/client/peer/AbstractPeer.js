@@ -26,7 +26,6 @@ export default class AbstractPeer extends EventEmitter {
     }
 
     loadRemoteDescription(data) {
-        console.log('loadRemoteDescription');
         const description = new RTCSessionDescription(data);
 
         this.connection.setRemoteDescription(description).catch(this.onError);

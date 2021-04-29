@@ -4,16 +4,18 @@ import Spectator from '@client/peer/Spectator';
 import 'webrtc-adapter';
 
 export default class PeerManager extends EventEmitter {
-    constructor(api, store, iceServers) {
+    constructor(api, iceServers = undefined) {
         super();
 
         this.api = api;
-        this.store = store;
-        this.iceServers = undefined;// iceServers;
-        this.distributors = null;
+        this.iceServers = iceServers;
+        this.stream = null;
         this.spectator = null;
+        this.distributors = new Map();
+        this.others = [];
 
         this.createDistributor = this.createDistributor.bind(this);
+        this.removeDistributor = this.removeDistributor.bind(this);
         this.onOffer = this.onOffer.bind(this);
         this.onAnswer = this.onAnswer.bind(this);
         this.onIceCandidate = this.onIceCandidate.bind(this);
@@ -21,28 +23,54 @@ export default class PeerManager extends EventEmitter {
         this.onReady = this.onReady.bind(this);
     }
 
-    distribute(stream) {
-        this.ensureIsFree();
-        console.log('distribute', this.getOthers());
-        this.distributors = this.getOthers().map(this.createDistributor);
-        console.log(this.distributors);
-        this.distributors.forEach(distributor => distributor.setStream(stream));
+    isStreaming() {
+        return this.stream !== null;
     }
 
-    getOthers() {
-        const { me, users } = this.store.getState().room;
+    setOthers(others) {
+        this.others = others;
 
-        return users.map(user => user.id).filter(id => id !== me);
+        if (this.stream) {
+            this.others.forEach(target => {
+                if (!this.distributors.has(target)) {
+                    this.createDistributor(target);
+                }
+            });
+
+            this.distributors.forEach((distributor, target) => {
+                if (!this.others.includes(target)) {
+                    this.removeDistributor(distributor);
+                }
+            });
+        }
+    }
+
+    distribute(stream) {
+        this.ensureIsFree();
+
+        this.stream = stream;
+
+        this.others.forEach(this.createDistributor);
     }
 
     createDistributor(target) {
         const distributor = new Distributor(target, this.iceServers);
 
+        this.distributors.set(target, distributor);
+
         distributor.addEventListener('offer', this.onOffer);
         distributor.addEventListener('icecandidate', this.onIceCandidate);
         distributor.addEventListener('ready', this.onReady);
 
-        return distributor;
+        distributor.setStream(this.stream);
+    }
+
+    removeDistributor(distributor) {
+        distributor.removeEventListener('offer', this.onOffer);
+        distributor.removeEventListener('icecandidate', this.onIceCandidate);
+        distributor.clear();
+
+        this.distributors.delete(distributor.target);
     }
 
     spectate(description) {
@@ -60,7 +88,7 @@ export default class PeerManager extends EventEmitter {
     }
 
     answer(sender, description) {
-        this.getDistributorById(sender).loadRemoteDescription(description);
+        this.distributors.get(sender).loadRemoteDescription(description);
     }
 
     addCandidate(sender, candidate) {
@@ -68,18 +96,17 @@ export default class PeerManager extends EventEmitter {
             return this.spectator.addCandidate(candidate);
         }
 
-        return this.getDistributorById(sender).addCandidate(candidate);
+        return this.distributors.get(sender).addCandidate(candidate);
     }
 
     onOffer(event) {
-        console.log('onOffer', event);
         const { description, target } = event.detail;
+
         this.api.offer(description, target);
     }
 
     onAnswer(event) {
-        console.log('onAnswer');
-        const { description, target } = event.detail;
+        const { description } = event.detail;
 
         this.api.answer(description);
     }
@@ -98,35 +125,27 @@ export default class PeerManager extends EventEmitter {
         this.emit('ready');
     }
 
-    getDistributorById(id) {
-        console.log('getDistributorById', id);
-        return this.distributors.find(distributor => distributor.target === id);
-    }
-
     ensureIsFree() {
-        if (this.distributors) {
+        if (this.stream !== null) {
             throw new Error('Already distributing.');
         }
 
-        if (this.spectator) {
+        if (this.spectator !== null) {
             throw new Error('Already spectating.');
         }
     }
 
     clear() {
-        if (this.spectator) {
+        if (this.spectator !== null) {
             this.spectator.removeEventListener('answer', this.onAnswer);
             this.spectator.removeEventListener('icecandidate', this.onIceCandidate);
             this.spectator.clear();
             this.spectator = null;
         }
 
-        this.distributors.forEach(distributor => {
-            distributor.removeEventListener('offer', this.onOffer);
-            distributor.removeEventListener('icecandidate', this.onIceCandidate);
-            distributor.clear();
-        });
+        this.distributors.forEach(this.removeDistributor);
+        this.distributors.clear();
 
-        this.distributors = null;
+        this.stream = null;
     }
 }

@@ -16,7 +16,7 @@ export const PLAYER_SEEK = 'PLAYER_SEEK';
 export const PLAYER_END = 'PLAYER_END';
 export const PLAYER_STOP = 'PLAYER_STOP';
 export const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
-export const PLAYER_STREAM = 'PLAYER_STREAM';
+export const PLAYER_TIMELINE = 'PLAYER_TIMELINE';
 
 export function loadVideoFromFile(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'file' } };
@@ -82,8 +82,8 @@ export function setShowtime(active) {
     return { type: PLAYER_SHOWTIME, payload: { active } };
 }
 
-export function setStreaming(active) {
-    return { type: PLAYER_STREAM, payload: { active } };
+export function setTimeline(currentTime, duration) {
+    return { type: PLAYER_TIMELINE, payload: { currentTime, duration } };
 }
 
 const initialState = {
@@ -99,7 +99,7 @@ const initialState = {
     fromServer: false,
     time: 0,
     showtime: false,
-    streaming: false,
+    currentTime: 0,
 };
 
 const inititalSubtitleState = {
@@ -216,8 +216,12 @@ export default function player(state = initialState, action) {
         case PLAYER_SHOWTIME:
             return { ...state, showtime: payload.active };
 
-        case PLAYER_STREAM:
-            return { ...state, streaming: payload.active };
+        case PLAYER_TIMELINE:
+            return {
+                ...state,
+                currentTime: payload.currentTime,
+                duration: payload.duration,
+            };
 
         case ROOM_LEAVE:
             return initialState;

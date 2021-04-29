@@ -149,7 +149,6 @@ export default class Video extends Component {
     }
 
     onCanPlay() {
-        console.log('onCanPlay');
         if (!this.props.loaded) {
             this.props.setLoaded(true);
 
@@ -160,11 +159,11 @@ export default class Video extends Component {
     }
 
     onCanPlayThrough() {
-        console.log('onCanPlayThrough');
+        // console.log('onCanPlayThrough');
     }
 
-    onLoadedMetadata(event) {
-        console.log('onLoadedMetadata', event);
+    onLoadedMetadata() {
+        // console.log('onLoadedMetadata', event);
     }
 
     onDurationChange() {
