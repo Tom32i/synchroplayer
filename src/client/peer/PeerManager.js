@@ -33,7 +33,7 @@ export default class PeerManager extends EventEmitter {
         if (this.stream) {
             this.others.forEach(target => {
                 if (!this.distributors.has(target)) {
-                    this.createDistributor(target);
+                    setTimeout(() => this.createDistributor(target), 500);
                 }
             });
 
@@ -68,15 +68,16 @@ export default class PeerManager extends EventEmitter {
     removeDistributor(distributor) {
         distributor.removeEventListener('offer', this.onOffer);
         distributor.removeEventListener('icecandidate', this.onIceCandidate);
+        distributor.removeEventListener('ready', this.onReady);
         distributor.clear();
 
         this.distributors.delete(distributor.target);
     }
 
-    spectate(description) {
+    spectate(description, sender) {
         this.ensureIsFree();
 
-        this.spectator = new Spectator(this.iceServers);
+        this.spectator = new Spectator(sender, this.iceServers);
 
         this.spectator.addEventListener('answer', this.onAnswer);
         this.spectator.addEventListener('icecandidate', this.onIceCandidate);
@@ -139,13 +140,19 @@ export default class PeerManager extends EventEmitter {
         if (this.spectator !== null) {
             this.spectator.removeEventListener('answer', this.onAnswer);
             this.spectator.removeEventListener('icecandidate', this.onIceCandidate);
+            this.spectator.removeEventListener('stream', this.onStream);
+            this.spectator.removeEventListener('ready', this.onReady);
             this.spectator.clear();
             this.spectator = null;
         }
 
-        this.distributors.forEach(this.removeDistributor);
-        this.distributors.clear();
+        if (this.stream) {
+            this.distributors.forEach(this.removeDistributor);
+            this.distributors.clear();
 
-        this.stream = null;
+            this.stream.getTracks().forEach(track => track.stop());
+
+            this.stream = null;
+        }
     }
 }

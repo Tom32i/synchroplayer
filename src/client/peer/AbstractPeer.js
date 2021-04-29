@@ -7,10 +7,12 @@ export default class AbstractPeer extends EventEmitter {
         this.connection = new RTCPeerConnection({ iceServers });
 
         this.loadLocalDescription = this.loadLocalDescription.bind(this);
+        this.onStateChange = this.onStateChange.bind(this);
         this.onIceCandidate = this.onIceCandidate.bind(this);
         this.onIceStateChange = this.onIceStateChange.bind(this);
         this.onError = this.onError.bind(this);
 
+        this.connection.addEventListener('connectionstatechange', this.onStateChange);
         this.connection.addEventListener('icecandidate', this.onIceCandidate);
         this.connection.addEventListener('iceconnectionstatechange', this.onIceStateChange);
     }
@@ -31,6 +33,18 @@ export default class AbstractPeer extends EventEmitter {
         this.connection.setRemoteDescription(description).catch(this.onError);
     }
 
+    onStateChange() {
+        const { connectionState } = this.connection;
+
+        console.info('Peer connection status: ', connectionState);
+
+        switch(connectionState) {
+            case 'connected':
+                this.emit('ready');
+                break;
+        }
+    }
+
     onIceCandidate(event) {
         if (event.candidate) {
             this.emit('icecandidate', {
@@ -43,14 +57,7 @@ export default class AbstractPeer extends EventEmitter {
     onIceStateChange() {
         const { iceConnectionState } = this.connection;
 
-        switch (iceConnectionState) {
-            case 'connected':
-                this.emit('ready');
-                break;
-
-            default:
-                console.info('ICE connection status: ', iceConnectionState);
-        }
+        console.info('ICE connection status: ', iceConnectionState);
     }
 
     onError(error) {
@@ -59,5 +66,9 @@ export default class AbstractPeer extends EventEmitter {
 
     clear() {
         this.connection.close();
+
+        this.connection.removeEventListener('connectionstatechange', this.onStateChange);
+        this.connection.removeEventListener('icecandidate', this.onIceCandidate);
+        this.connection.removeEventListener('iceconnectionstatechange', this.onIceStateChange);
     }
 }

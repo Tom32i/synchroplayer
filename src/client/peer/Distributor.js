@@ -6,13 +6,14 @@ export default class Distributor extends AbstractPeer {
 
         this.target = target;
         this.stream = null;
+        this.tracks = [];
 
         this.onLocalDescriptionLoaded = this.onLocalDescriptionLoaded.bind(this);
     }
 
     setStream(stream) {
         this.stream = stream;
-        this.stream.getTracks().forEach(track => this.connection.addTrack(track, this.stream));
+        this.tracks = this.stream.getTracks().map(track => this.connection.addTrack(track, this.stream));
 
         this.connection.createOffer({ offerToReceiveAudio: 1, offerToReceiveVideo: 1 })
             .then(this.loadLocalDescription)
@@ -29,14 +30,11 @@ export default class Distributor extends AbstractPeer {
 
     clear() {
         if (this.stream) {
-            this.stream.getTracks().forEach(track => {
-                this.connection.removeTrack(track, this.stream);
-                track.stop();
-            });
-
+            this.tracks.forEach(sender => this.connection.removeTrack(sender));
+            this.tracks.length = 0;
             this.stream = null;
         }
 
-        super.close();
+        super.clear();
     }
 }

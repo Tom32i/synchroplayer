@@ -17,6 +17,7 @@ export const PLAYER_END = 'PLAYER_END';
 export const PLAYER_STOP = 'PLAYER_STOP';
 export const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
 export const PLAYER_TIMELINE = 'PLAYER_TIMELINE';
+export const PLAYER_UNLOAD_STREAM = 'PLAYER_UNLOAD_STREAM';
 
 export function loadVideoFromFile(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'file' } };
@@ -32,6 +33,10 @@ export function loadVideoFromYoutube(url) {
 
 export function loadVideoFromServer(source, name, url = null) {
     return { type: PLAYER_LOAD_FROM_SERVER, payload: { source, name, url } };
+}
+
+export function unloadStream() {
+    return { type: PLAYER_UNLOAD_STREAM };
 }
 
 export function completeVideoFromFile(url, name, type = null) {
@@ -173,6 +178,8 @@ export default function player(state = initialState, action) {
                 name: payload.name || state.name,
                 source: payload.source,
                 fromServer: true,
+                playing: false,
+                time: 0,
             };
 
         case PLAYER_COMPLETE_FROM_FILE:
@@ -181,6 +188,16 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 type: payload.type,
+            };
+
+        case PLAYER_UNLOAD_STREAM:
+            return {
+                ...state,
+                url: null,
+                source: 'file',
+                fromServer: true,
+                playing: false,
+                time: 0,
             };
 
         case PLAYER_SET_DURATION:

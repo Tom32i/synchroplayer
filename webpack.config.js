@@ -1,4 +1,5 @@
 const path = require('path');
+const { DefinePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const resolve = {
@@ -48,7 +49,10 @@ const clientConfig = env => ({
   },
   resolve,
   plugins: [
-    new HtmlWebpackPlugin({ template: './index.html' })
+    new HtmlWebpackPlugin({ template: './index.html' }),
+    new DefinePlugin({
+      ICE_SERVERS: env.iceServers || '{}',
+    }),
   ]
 });
 

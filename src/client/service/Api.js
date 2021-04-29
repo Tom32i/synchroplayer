@@ -78,4 +78,8 @@ export default class Api {
     newIceCandidate(description, target) {
         this.client.send('peer:candidate', { target, description: JSON.stringify(description.toJSON()) });
     }
+
+    stopStreaming() {
+        this.client.send('peer:stop');
+    }
 }

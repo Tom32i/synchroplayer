@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
 import { socketOpen, socketClose, me, userAdd, userRemove, userReady, userStreaming } from '@client/store/room';
-import { play, pause, seek, stop, loadVideoFromServer, setTimeline } from '@client/store/player';
+import { play, pause, seek, stop, loadVideoFromServer, setTimeline, unloadStream } from '@client/store/player';
 
 class Socket extends Component {
     static propTypes = {
@@ -29,6 +29,7 @@ class Socket extends Component {
         onControlStop: PropTypes.func.isRequired,
         onVideo: PropTypes.func.isRequired,
         setTimeline: PropTypes.func.isRequired,
+        unloadStream: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
@@ -49,6 +50,7 @@ class Socket extends Component {
         this.onPeerAnswer = this.onPeerAnswer.bind(this);
         this.onPeerCandidate = this.onPeerCandidate.bind(this);
         this.onPeerTimeline = this.onPeerTimeline.bind(this);
+        this.onPeerStop = this.onPeerStop.bind(this);
     }
 
     componentDidMount() {
@@ -76,6 +78,7 @@ class Socket extends Component {
         this.api.addEventListener('peer:answer', this.onPeerAnswer);
         this.api.addEventListener('peer:candidate', this.onPeerCandidate);
         this.api.addEventListener('peer:timeline', this.onPeerTimeline);
+        this.api.addEventListener('peer:stop', this.onPeerStop);
     }
 
     componentWillUnmount() {
@@ -101,6 +104,7 @@ class Socket extends Component {
         this.api.removeEventListener('peer:answer', this.onPeerAnswer);
         this.api.removeEventListener('peer:candidate', this.onPeerCandidate);
         this.api.removeEventListener('peer:timeline', this.onPeerTimeline);
+        this.api.removeEventListener('peer:stop', this.onPeerStop);
 
         // Close connection
         this.api.leave();
@@ -137,8 +141,8 @@ class Socket extends Component {
     }
 
     onPeerOffer(event) {
-        const { description } = event.detail;
-        this.peer.spectate(JSON.parse(description));
+        const { description, sender } = event.detail;
+        this.peer.spectate(JSON.parse(description), sender);
         this.props.onVideo('peer');
     }
 
@@ -155,6 +159,11 @@ class Socket extends Component {
     onPeerTimeline(event) {
         const { currentTime, duration } = event.detail;
         this.props.setTimeline(currentTime, duration);
+    }
+
+    onPeerStop() {
+        this.props.unloadStream();
+        this.peer.clear();
     }
 
     /**
@@ -194,6 +203,7 @@ export default connect(
         onControlSeek: event => dispatch(seek(event.detail)),
         onControlStop: event => dispatch(stop(event.detail)),
         onVideo: (source, name, url = null) => dispatch(loadVideoFromServer(source, name, url)),
+        unloadStream: () => dispatch(unloadStream()),
         setTimeline: (currentTime, duration) => dispatch(setTimeline(currentTime, duration)),
     })
 )(Socket);

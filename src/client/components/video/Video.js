@@ -139,7 +139,9 @@ export default class Video extends Component {
     }
 
     onLoadStart() {
-        if (this.props.loaded) {
+        if (typeof this.props.src === 'undefined') {
+            this.props.setLoaded(true);
+        } else {
             this.props.setLoaded(false);
         }
     }
@@ -159,11 +161,10 @@ export default class Video extends Component {
     }
 
     onCanPlayThrough() {
-        // console.log('onCanPlayThrough');
+        this.props.setLoaded(true);
     }
 
     onLoadedMetadata() {
-        // console.log('onLoadedMetadata', event);
     }
 
     onDurationChange() {
@@ -182,7 +183,7 @@ export default class Video extends Component {
         console.error(error);
     }
 
-    render(){
+    render() {
         const { src, preload, autoplay } = this.props;
 
         return (

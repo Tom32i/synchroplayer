@@ -146,6 +146,7 @@ class Player extends Component {
             this.api.setTimeline(this.video.currentTime, this.video.duration);
         } else {
             this.peer.clear();
+            this.api.stopStreaming();
         }
     }
 
