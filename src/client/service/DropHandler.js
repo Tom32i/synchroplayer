@@ -143,13 +143,18 @@ export default class DropHandler {
             return this.store.dispatch(loadVideoFromYoutube(id));
         }
 
+
         const { href, pathname } = this.getUrl(value);
+
+        console.log(value, href, pathname);
 
         if (href) {
             return new HeadRequest(href, ['Content-Type', 'Content-Length'], ([type]) => {
+                console.log(type);
                 switch (type) {
                     case 'video/webm':
                     case 'video/mp4':
+                    case 'application/octet-stream':
                         this.handleVideoUrl(href, pathname, type);
                         break;
 
@@ -171,6 +176,8 @@ export default class DropHandler {
                         this.handleSrtSubtitleUrl(href, pathname, type);
                         break;
                 }
+
+                console.info(`Url "${value}" of type "${type}" not supported.`);
             }, error => console.error(error));
         }
     }
