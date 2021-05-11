@@ -46,7 +46,7 @@ export default class HeadRequest {
    */
     onResponse() {
         const headers = this.headers.map(name => this.request.getResponseHeader(name));
-        // console.log(this.request.getAllResponseHeaders());
+
         return this.onSuccess(headers);
     }
 

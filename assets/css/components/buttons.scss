@@ -37,4 +37,8 @@
     &[disabled] .icon-loader {
         color: $color-primary;
     }
+
+    &.active, &.active:hover {
+        color: $color-primary;
+    }
 }

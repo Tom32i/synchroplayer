@@ -16,6 +16,8 @@ export const PLAYER_SEEK = 'PLAYER_SEEK';
 export const PLAYER_END = 'PLAYER_END';
 export const PLAYER_STOP = 'PLAYER_STOP';
 export const PLAYER_SHOWTIME = 'PLAYER_SHOWTIME';
+export const PLAYER_TIMELINE = 'PLAYER_TIMELINE';
+export const PLAYER_UNLOAD_STREAM = 'PLAYER_UNLOAD_STREAM';
 
 export function loadVideoFromFile(url, name, type) {
     return { type: PLAYER_LOAD_FROM_FILE, payload: { url, name, type, source: 'file' } };
@@ -31,6 +33,10 @@ export function loadVideoFromYoutube(url) {
 
 export function loadVideoFromServer(source, name, url = null) {
     return { type: PLAYER_LOAD_FROM_SERVER, payload: { source, name, url } };
+}
+
+export function unloadStream() {
+    return { type: PLAYER_UNLOAD_STREAM };
 }
 
 export function completeVideoFromFile(url, name, type = null) {
@@ -81,6 +87,10 @@ export function setShowtime(active) {
     return { type: PLAYER_SHOWTIME, payload: { active } };
 }
 
+export function setTimeline(currentTime, duration) {
+    return { type: PLAYER_TIMELINE, payload: { currentTime, duration } };
+}
+
 const initialState = {
     url: null,
     source: null,
@@ -94,6 +104,7 @@ const initialState = {
     fromServer: false,
     time: 0,
     showtime: false,
+    currentTime: 0,
 };
 
 const inititalSubtitleState = {
@@ -127,7 +138,6 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
                 name: payload.name,
                 type: payload.type,
                 source: payload.source,
@@ -141,7 +151,6 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
                 source: payload.source,
                 fromServer: false,
                 playing: false,
@@ -153,7 +162,6 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
                 name: payload.name,
                 type: payload.type,
                 source: payload.source,
@@ -167,10 +175,11 @@ export default function player(state = initialState, action) {
             return {
                 ...state,
                 url: payload.url,
-                sources: [],
-                name: payload.name,
+                name: payload.name || state.name,
                 source: payload.source,
                 fromServer: true,
+                playing: false,
+                time: 0,
             };
 
         case PLAYER_COMPLETE_FROM_FILE:
@@ -179,6 +188,16 @@ export default function player(state = initialState, action) {
                 url: payload.url,
                 name: payload.name,
                 type: payload.type,
+            };
+
+        case PLAYER_UNLOAD_STREAM:
+            return {
+                ...state,
+                url: null,
+                source: 'file',
+                fromServer: true,
+                playing: false,
+                time: 0,
             };
 
         case PLAYER_SET_DURATION:
@@ -213,6 +232,13 @@ export default function player(state = initialState, action) {
 
         case PLAYER_SHOWTIME:
             return { ...state, showtime: payload.active };
+
+        case PLAYER_TIMELINE:
+            return {
+                ...state,
+                currentTime: payload.currentTime,
+                duration: payload.duration,
+            };
 
         case ROOM_LEAVE:
             return initialState;

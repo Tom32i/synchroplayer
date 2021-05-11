@@ -2,9 +2,8 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from '@client/container';
-import { socketOpen, socketClose, me, userAdd, userRemove, userReady } from '@client/store/room';
-import { loadVideoFromServer } from '@client/store/player';
-import { play, pause, seek, stop } from '@client/store/player';
+import { socketOpen, socketClose, me, userAdd, userRemove, userReady, userStreaming } from '@client/store/room';
+import { play, pause, seek, stop, loadVideoFromServer, setTimeline, unloadStream } from '@client/store/player';
 
 class Socket extends Component {
     static propTypes = {
@@ -23,11 +22,14 @@ class Socket extends Component {
         onUserAdd: PropTypes.func.isRequired,
         onUserRemove: PropTypes.func.isRequired,
         onUserReady: PropTypes.func.isRequired,
+        onUserStreaming: PropTypes.func.isRequired,
         onControlPlay: PropTypes.func.isRequired,
         onControlPause: PropTypes.func.isRequired,
         onControlSeek: PropTypes.func.isRequired,
         onControlStop: PropTypes.func.isRequired,
         onVideo: PropTypes.func.isRequired,
+        setTimeline: PropTypes.func.isRequired,
+        unloadStream: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
@@ -38,11 +40,17 @@ class Socket extends Component {
         super(props);
 
         this.api = get('api');
+        this.peer = get('peer');
 
         this.onError = this.onError.bind(this);
         this.onVideoFile = this.onVideoFile.bind(this);
         this.onVideoUrl = this.onVideoUrl.bind(this);
         this.onVideoYoutube = this.onVideoYoutube.bind(this);
+        this.onPeerOffer = this.onPeerOffer.bind(this);
+        this.onPeerAnswer = this.onPeerAnswer.bind(this);
+        this.onPeerCandidate = this.onPeerCandidate.bind(this);
+        this.onPeerTimeline = this.onPeerTimeline.bind(this);
+        this.onPeerStop = this.onPeerStop.bind(this);
     }
 
     componentDidMount() {
@@ -58,6 +66,7 @@ class Socket extends Component {
         this.api.addEventListener('user:add', this.props.onUserAdd);
         this.api.addEventListener('user:remove', this.props.onUserRemove);
         this.api.addEventListener('user:ready', this.props.onUserReady);
+        this.api.addEventListener('user:streaming', this.props.onUserStreaming);
         this.api.addEventListener('control:play', this.props.onControlPlay);
         this.api.addEventListener('control:pause', this.props.onControlPause);
         this.api.addEventListener('control:stop', this.props.onControlStop);
@@ -65,6 +74,11 @@ class Socket extends Component {
         this.api.addEventListener('video:file', this.onVideoFile);
         this.api.addEventListener('video:url', this.onVideoUrl);
         this.api.addEventListener('video:youtube', this.onVideoYoutube);
+        this.api.addEventListener('peer:offer', this.onPeerOffer);
+        this.api.addEventListener('peer:answer', this.onPeerAnswer);
+        this.api.addEventListener('peer:candidate', this.onPeerCandidate);
+        this.api.addEventListener('peer:timeline', this.onPeerTimeline);
+        this.api.addEventListener('peer:stop', this.onPeerStop);
     }
 
     componentWillUnmount() {
@@ -78,6 +92,7 @@ class Socket extends Component {
         this.api.removeEventListener('user:add', this.props.onUserAdd);
         this.api.removeEventListener('user:remove', this.props.onUserRemove);
         this.api.removeEventListener('user:ready', this.props.onUserReady);
+        this.api.removeEventListener('user:streaming', this.props.onUserStreaming);
         this.api.removeEventListener('control:play', this.props.onControlPlay);
         this.api.removeEventListener('control:pause', this.props.onControlPause);
         this.api.removeEventListener('control:stop', this.props.onControlStop);
@@ -85,6 +100,11 @@ class Socket extends Component {
         this.api.removeEventListener('video:file', this.onVideoFile);
         this.api.removeEventListener('video:url', this.onVideoUrl);
         this.api.removeEventListener('video:youtube', this.onVideoYoutube);
+        this.api.removeEventListener('peer:offer', this.onPeerOffer);
+        this.api.removeEventListener('peer:answer', this.onPeerAnswer);
+        this.api.removeEventListener('peer:candidate', this.onPeerCandidate);
+        this.api.removeEventListener('peer:timeline', this.onPeerTimeline);
+        this.api.removeEventListener('peer:stop', this.onPeerStop);
 
         // Close connection
         this.api.leave();
@@ -107,20 +127,43 @@ class Socket extends Component {
 
     onVideoUrl(event) {
         const { name, url } = event.detail;
-
         this.props.onVideo('url', name, url);
     }
 
     onVideoYoutube(event) {
         const { name, url } = event.detail;
-
         this.props.onVideo('youtube', name, url);
     }
 
     onVideoFile(event) {
         const { name } = event.detail;
-
         this.props.onVideo('file', name);
+    }
+
+    onPeerOffer(event) {
+        const { description, sender } = event.detail;
+        this.peer.spectate(JSON.parse(description), sender);
+        this.props.onVideo('peer');
+    }
+
+    onPeerAnswer(event) {
+        const { sender, description } = event.detail;
+        this.peer.answer(sender, JSON.parse(description));
+    }
+
+    onPeerCandidate(event) {
+        const { sender, description } = event.detail;
+        this.peer.addCandidate(sender, JSON.parse(description));
+    }
+
+    onPeerTimeline(event) {
+        const { currentTime, duration } = event.detail;
+        this.props.setTimeline(currentTime, duration);
+    }
+
+    onPeerStop() {
+        this.props.unloadStream();
+        this.peer.clear();
     }
 
     /**
@@ -154,10 +197,13 @@ export default connect(
         onUserAdd: event => dispatch(userAdd(event.detail)),
         onUserRemove: event => dispatch(userRemove(event.detail)),
         onUserReady: event => dispatch(userReady(event.detail)),
+        onUserStreaming: event => dispatch(userStreaming(event.detail)),
         onControlPlay: event => dispatch(play(event.detail)),
         onControlPause: event => dispatch(pause(event.detail)),
         onControlSeek: event => dispatch(seek(event.detail)),
         onControlStop: event => dispatch(stop(event.detail)),
         onVideo: (source, name, url = null) => dispatch(loadVideoFromServer(source, name, url)),
+        unloadStream: () => dispatch(unloadStream()),
+        setTimeline: (currentTime, duration) => dispatch(setTimeline(currentTime, duration)),
     })
 )(Socket);

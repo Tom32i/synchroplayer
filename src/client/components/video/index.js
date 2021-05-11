@@ -6,7 +6,7 @@ import YoutubeVideoComponent from '@client/components/video/YoutubeVideo';
 export default function Wrapper(Component) {
     return connect(
         state => ({
-            src: state.player.url,
+            src: state.player.source === 'peer' ? undefined : state.player.url,
             playing: state.player.playing,
             time: state.player.time,
             authorized: state.player.authorized,
