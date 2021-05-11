@@ -33,8 +33,14 @@
         "indent": [
             "error",
             4,
-            { "SwitchCase": 1 }
+            {
+                "SwitchCase": 1,
+                "ignoredNodes": [
+                    "TemplateLiteral"
+                ]
+            }
         ],
+        "template-curly-spacing": 0,
         "linebreak-style": [
             "error",
             "unix"

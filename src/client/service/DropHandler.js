@@ -143,14 +143,10 @@ export default class DropHandler {
             return this.store.dispatch(loadVideoFromYoutube(id));
         }
 
-
         const { href, pathname } = this.getUrl(value);
-
-        console.log(value, href, pathname);
 
         if (href) {
             return new HeadRequest(href, ['Content-Type', 'Content-Length'], ([type]) => {
-                console.log(type);
                 switch (type) {
                     case 'video/webm':
                     case 'video/mp4':
