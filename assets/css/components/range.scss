@@ -12,7 +12,7 @@ $thumb-diameter: 1.5rem;
   width: $track-width;
   height: $track-height;
   background: $track-color;
-  border-radius: $track-height / 2;
+  border-radius: calc($track-height / 2);
 
   @if $fill == 1 {
     background: linear-gradient($fill-color, $fill-color)
