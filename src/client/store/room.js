@@ -4,6 +4,7 @@ export const ROOM_ME = 'ROOM_ME';
 export const ROOM_USER_ADD = 'ROOM_USER_ADD';
 export const ROOM_USER_REMOVE = 'ROOM_USER_REMOVE';
 export const ROOM_USER_READY = 'ROOM_USER_READY';
+export const ROOM_USER_STREAMING = 'ROOM_USER_STREAMING';
 export const ROOM_LEAVE = 'ROOM_LEAVE';
 
 // ACTIONS
@@ -32,6 +33,10 @@ export function userReady(payload) {
     return { type: ROOM_USER_READY, payload };
 }
 
+export function userStreaming(id = null) {
+    return { type: ROOM_USER_STREAMING, payload: { id } };
+}
+
 export function leave() {
     return { type: ROOM_LEAVE };
 }
@@ -41,6 +46,7 @@ export function leave() {
 const initialState = {
     connected: false,
     me: null,
+    streaming: null,
     users: [],
 };
 
@@ -102,6 +108,12 @@ export default function room(state = initialState, action) {
             return {
                 ...state,
                 users: state.users.map(userState => user(userState, action)),
+            };
+
+        case ROOM_USER_STREAMING:
+            return {
+                ...state,
+                streaming: payload.id,
             };
 
         case ROOM_LEAVE:

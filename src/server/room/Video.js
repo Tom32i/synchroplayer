@@ -8,67 +8,78 @@ export default class Video extends EventEmitter {
         this.url = url;
         this.name = name;
         this.playedAt = null;
-        this.at = null;
-        this.currentTime = 0;
+        this.playedTime = 0;
+        this.timelineCurrentTime = 0;
+        this.timelineDuration = 0;
     }
 
     get playing() {
         return this.playedAt !== null;
     }
 
-    get time() {
+    get currentTime() {
         if (this.playing) {
-            return this.currentTime + (Date.now() - this.playedAt) / 1000;
+            return this.playedTime + (Date.now() - this.playedAt) / 1000;
         }
 
-        return this.currentTime;
+        return this.playedTime;
     }
 
-    play(time = this.time) {
+    play(time = this.currentTime, now = Date.now()) {
         if (!this.playing) {
-            this.playedAt = Date.now();
-            this.currentTime = time;
+            this.playedAt = now;
+            this.playedTime = time;
             this.emit('play', time);
             console.warn('Video playing:', time);
         }
     }
 
-    pause(time = this.time) {
+    pause(time = this.currentTime) {
         if (this.playing) {
             this.playedAt = null;
-            this.currentTime = time;
+            this.playedTime = time;
             this.emit('pause', time);
             console.warn('Video paused:', time);
         }
     }
 
     end() {
-        if (this.playing || this.currentTime > 0) {
+        if (this.playing || this.playedTime > 0) {
             this.playedAt = null;
-            this.currentTime = this.time;
+            this.playedTime = 0;
             this.emit('end');
             console.warn('Video ended.');
         }
     }
 
     stop() {
-        if (this.playing || this.currentTime > 0) {
+        if (this.playing || this.playedTime > 0) {
             this.playedAt = null;
-            this.currentTime = 0;
+            this.playedTime = 0;
             this.emit('stop');
             console.warn('Video stopped.');
         }
     }
 
-    seek(time) {
-        if (time !== this.currentTime) {
-            if (this.playing) {
-                this.playedAt = Date.now();
-            }
-
-            this.currentTime = time;
-            this.emit('seek', time);
-            console.warn('Video seeked:', time);
+    seek(time, now = Date.now()) {
+        if (this.playing) {
+            this.playedAt = now;
         }
+
+        this.playedTime = time;
+        this.emit('seek', time);
+        console.warn('Video seeked:', time);
+    }
+
+    setTimeline(currentTime, duration) {
+        this.timelineCurrentTime = currentTime;
+        this.timelineDuration = duration;
+    }
+
+    getTimeLine() {
+        return {
+            currentTime: this.timelineCurrentTime,
+            duration: this.timelineDuration,
+        };
     }
 }

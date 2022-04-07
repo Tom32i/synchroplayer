@@ -4,7 +4,7 @@ import Subtitles from '@client/components/Subtitles';
 
 export default class Video extends Component {
     static propTypes = {
-        src: PropTypes.string.isRequired,
+        src: PropTypes.string,
         playing: PropTypes.bool.isRequired,
         time: PropTypes.number.isRequired,
         authorized: PropTypes.bool.isRequired,
@@ -20,11 +20,14 @@ export default class Video extends Component {
         onPaused: PropTypes.func.isRequired,
         onEnded: PropTypes.func.isRequired,
         preload: PropTypes.string,
+        autoplay: PropTypes.bool,
         volume: PropTypes.number.isRequired,
     };
 
     static defaultProps = {
         preload: 'auto',
+        autoplay: false,
+        src: undefined,
     };
 
     constructor(props) {
@@ -36,9 +39,11 @@ export default class Video extends Component {
         this.setElement = this.setElement.bind(this);
         this.play = this.play.bind(this);
         this.onLoadStart = this.onLoadStart.bind(this);
+        this.onProgress = this.onProgress.bind(this);
         this.onCanPlay = this.onCanPlay.bind(this);
         this.onCanPlayThrough = this.onCanPlayThrough.bind(this);
         this.onDurationChange = this.onDurationChange.bind(this);
+        this.onLoadedMetadata = this.onLoadedMetadata.bind(this);
         this.onNotAuthorized = this.onNotAuthorized.bind(this);
         this.onEnded = this.onEnded.bind(this);
         this.onAuthorized = this.onAuthorized.bind(this);
@@ -67,7 +72,7 @@ export default class Video extends Component {
     setElement(element) {
         this.element = element;
 
-        if (element) {
+        if (this.element) {
             this.element.volume = this.props.volume;
         }
     }
@@ -100,9 +105,25 @@ export default class Video extends Component {
     }
 
     seek(time) {
-        if (typeof time === 'number') {
+        if (typeof time === 'number' && this.element.seekable.length) {
             this.element.currentTime = time;
         }
+    }
+
+    captureStream() {
+        if (typeof this.element.mozCaptureStream === 'function') {
+            return this.element.mozCaptureStream();
+        }
+
+        if (typeof this.element.captureStream === 'function') {
+            return this.element.captureStream();
+        }
+
+        return null;
+    }
+
+    loadStream(stream) {
+        this.element.srcObject = stream;
     }
 
     onAuthorized() {
@@ -118,9 +139,15 @@ export default class Video extends Component {
     }
 
     onLoadStart() {
-        if (this.props.loaded) {
+        if (typeof this.props.src === 'undefined') {
+            this.props.setLoaded(true);
+        } else {
             this.props.setLoaded(false);
         }
+    }
+
+    onProgress() {
+        this.props.onProgress();
     }
 
     onCanPlay() {
@@ -134,12 +161,17 @@ export default class Video extends Component {
     }
 
     onCanPlayThrough() {
+        this.props.setLoaded(true);
+    }
 
+    onLoadedMetadata() {
     }
 
     onDurationChange() {
-        this.props.setDuration(this.element.duration);
-        this.props.onDurationChange();
+        if (this.element.duration !== Infinity) {
+            this.props.setDuration(this.element.duration);
+            this.props.onDurationChange();
+        }
     }
 
     onEnded() {
@@ -151,19 +183,21 @@ export default class Video extends Component {
         console.error(error);
     }
 
-    render(){
-        const { src, preload } = this.props;
+    render() {
+        const { src, preload, autoplay } = this.props;
 
         return (
             <video
                 ref={this.setElement}
                 src={src}
                 preload={preload}
+                autoPlay={autoplay}
                 onLoadStart={this.onLoadStart}
-                onProgress={this.props.onProgress}
+                onProgress={this.onProgress}
                 onCanPlay={this.onCanPlay}
                 onCanPlayThrough={this.onCanPlayThrough}
                 onDurationChange={this.onDurationChange}
+                onLoadedMetadata={this.onLoadedMetadata}
                 onTimeUpdate={this.props.onTimeUpdate}
                 onPlay={this.props.onPlayed}
                 onPause={this.props.onPaused}

@@ -27,7 +27,8 @@
         }
     },
     "globals": {
-        "YT": "readonly"
+        "YT": "readonly",
+        "ICE_SERVERS": "readonly"
     },
     "rules": {
         "indent": [
@@ -53,12 +54,15 @@
             "error",
             "always"
         ],
+        "no-unused-vars": [
+            "warn"
+        ],
         "no-console": [
-            "error",
+            "warn",
             { "allow": ["info", "warn", "error"] }
         ],
         "no-inline-comments": [
-            "error"
+            "warn"
         ],
         "spaced-comment": [
             "error",

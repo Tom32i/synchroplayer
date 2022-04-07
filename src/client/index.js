@@ -17,7 +17,10 @@ get('drop-handler').start();
 
 // Register listeners
 get('watcher')
-    .subscribeAll(['listener:storage'].map(get))
+    .subscribeAll([
+        'listener:storage',
+        'listener:peer',
+    ].map(get))
     .start();
 
 // Load options from storage

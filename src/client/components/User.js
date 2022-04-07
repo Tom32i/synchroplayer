@@ -6,6 +6,7 @@ export default class User extends Component {
         id: PropTypes.number.isRequired,
         me: PropTypes.bool.isRequired,
         ready: PropTypes.bool.isRequired,
+        streaming: PropTypes.bool.isRequired,
         name: PropTypes.string,
     };
 
@@ -14,11 +15,12 @@ export default class User extends Component {
     };
 
     render() {
-        const { me, ready } = this.props;
+        const { me, ready, streaming } = this.props;
         const classNames = [
             'user',
             ready ? 'ready' : 'loading',
             me ? 'me' : '',
+            streaming ? 'streaming' : '',
         ];
 
         return (
@@ -27,6 +29,7 @@ export default class User extends Component {
                 <sup>
                     <span className={ready ? 'icon-check' : 'icon-cross'} />
                 </sup>
+                {streaming ? <sub><span className="icon-stream" /></sub> : null}
             </li>
         );
     }
