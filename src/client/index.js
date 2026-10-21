@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { get } from '@client/container';
 import Router from '@client/scenes';
@@ -29,9 +29,8 @@ get('listener:storage').load();
 // Youtube API
 window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {};
 
-render(
+createRoot(document.getElementById('root')).render(
     <Provider store={get('store')}>
         <Router />
-    </Provider>,
-    document.getElementById('root')
+    </Provider>
 );
