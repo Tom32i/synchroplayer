@@ -7,6 +7,9 @@
   },
   "author": "Thomas Jarrand <thomas.jarrand@gmail.com> (https://thomas.jarrand.fr)",
   "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
   "files": [
     "build/",
     "bin/"

@@ -61,7 +61,7 @@ const serverConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [[ '@babel/preset-env', { targets: { node: true } } ]],
+            presets: [[ '@babel/preset-env', { targets: { node: '24' } } ]],
           }
         }
       }
