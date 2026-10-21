@@ -1,16 +1,16 @@
-import { Codec, StringCodec, LongStringCodec } from 'netcode/src/encoder/codec';
+import { Codec, StringCodec, StringLongCodec } from 'netcode/encoder';
 
 export default class UrlVideoCodec extends Codec {
     constructor() {
         super();
 
         this.stringCodec = new StringCodec();
-        this.longStringCodec = new LongStringCodec();
+        this.stringLongCodec = new StringLongCodec();
     }
 
     getByteLength(data) {
         return this.stringCodec.getByteLength(data.name)
-            + this.longStringCodec.getByteLength(data.url);
+            + this.stringLongCodec.getByteLength(data.url);
     }
 
     encode(buffer, offset, data) {
@@ -20,7 +20,7 @@ export default class UrlVideoCodec extends Codec {
 
         offset += this.stringCodec.getByteLength(name);
 
-        this.longStringCodec.encode(buffer, offset, url);
+        this.stringLongCodec.encode(buffer, offset, url);
     }
 
     decode(buffer, offset) {
@@ -28,7 +28,7 @@ export default class UrlVideoCodec extends Codec {
 
         offset += this.stringCodec.getByteLength(name);
 
-        const url = this.longStringCodec.decode(buffer, offset);
+        const url = this.stringLongCodec.decode(buffer, offset);
 
         return { url, name };
     }

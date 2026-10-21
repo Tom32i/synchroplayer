@@ -1,5 +1,4 @@
-import NetcodeServer from 'netcode/src/server/Server';
-import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
+import { Server as NetcodeServer, BinaryEncoder } from 'netcode/server';
 import events from '@events';
 import RoomManager from '@server/room/RoomManager';
 
