@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { get } from '@client/container';
 import Loop from '@client/common/Loop';
 import Video from '@client/components/video/Video';
