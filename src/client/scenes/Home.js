@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import I18n from 'i18n-js';
 import { connect } from 'react-redux';

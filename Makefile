@@ -15,7 +15,7 @@ build:
 
 ## Lint
 lint:
-	npx eslint src/* --ext .js,.json --fix
+	npx eslint src --fix
 
 start-client:
 	php -S 0.0.0.0:8020 -t build

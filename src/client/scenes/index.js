@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Home from '@client/scenes/Home';
 import Room from '@client/scenes/Room';
@@ -17,6 +17,13 @@ function Router(props) {
             throw new Error('Not found');
     }
 }
+
+Router.propTypes = {
+    route: PropTypes.string,
+    parameters: PropTypes.shape({
+        id: PropTypes.string,
+    }),
+};
 
 export default connect(
     state => ({
