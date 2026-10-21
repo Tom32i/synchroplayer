@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import I18n from 'i18n-js';
+import i18n from '@client/translations';
 import { open } from '@client/store/about';
 
 function AboutButton(props) {
     return <button
         type="button"
         className="button icon-info"
-        title={I18n.t('about.button')}
+        title={i18n.t('about.button')}
         onClick={props.open}
     />;
 }

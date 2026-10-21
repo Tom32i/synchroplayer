@@ -2,7 +2,6 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { get } from '@client/container';
 import Router from '@client/scenes';
-import '@client/translations';
 import '@css/style.scss';
 
 // Setup router

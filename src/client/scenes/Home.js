@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import I18n from 'i18n-js';
+import i18n from '@client/translations';
 import { connect } from 'react-redux';
 import { navigate } from '@client/navigation/store';
 import Logo from '@client/components/Logo';
@@ -26,7 +26,7 @@ class Home extends Component {
         return(
             <div className="home">
                 <h1 className="title">Synchroplayer</h1>
-                <p className="starter">{I18n.t('home.starter')}</p>
+                <p className="starter">{i18n.t('home.starter')}</p>
                 <div className="top-bar">
                     <Logo />
                     <AboutButton />
