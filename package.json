@@ -24,8 +24,8 @@
     "react-redux": "^9.3.0",
     "redux": "^5.0.1",
     "redux-logger": "^3.0.6",
-    "reset-css": "^5.0.1",
-    "tom32i-event-emitter.js": "^2.0.5"
+    "reset-css": "^5.0.2",
+    "tom32i-event-emitter.js": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^8.0.7",
