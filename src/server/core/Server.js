@@ -1,11 +1,13 @@
-import NetcodeServer from 'netcode/src/server/Server';
-import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
+import { Server as NetcodeServer, BinaryEncoder } from 'netcode/server';
 import events from '@events';
+import ClientDirectory from '@server/core/ClientDirectory';
 import RoomManager from '@server/room/RoomManager';
 
 export default class Server extends NetcodeServer {
     constructor(port = 8001, hostname = '0.0.0.0') {
-        super(port, hostname, new BinaryEncoder(events), 30, Math.pow(2, 14), undefined, false);
+        const encoder = new BinaryEncoder(events);
+
+        super(port, hostname, encoder, 30, Math.pow(2, 14), new ClientDirectory(encoder), false);
 
         this.joinMatcher = new RegExp('^/([^/]+)/?$');
         this.rooms = new RoomManager();

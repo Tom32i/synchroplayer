@@ -1,23 +1,23 @@
-import { Codec, Int32Codec } from 'netcode/src/encoder/codec';
+import { Codec, UInt32Codec } from 'netcode/encoder';
 
 export default class SeekCodec extends Codec {
     constructor() {
         super();
 
-        this.int32Codec = new Int32Codec();
+        this.uint32Codec = new UInt32Codec();
     }
 
     getByteLength() {
-        return this.int32Codec.getByteLength();
+        return this.uint32Codec.getByteLength();
     }
 
     encode(buffer, offset, data) {
         // Seconds to milliseconds
-        this.int32Codec.encode(buffer, offset, data * 1000);
+        this.uint32Codec.encode(buffer, offset, data * 1000);
     }
 
     decode(buffer, offset) {
         // Milliseconds to seconds
-        return this.int32Codec.decode(buffer, offset) / 1000;
+        return this.uint32Codec.decode(buffer, offset) / 1000;
     }
 }
