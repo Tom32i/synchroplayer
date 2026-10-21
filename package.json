@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "@elao/container.js": "^3.0.2",
-    "i18n-js": "^3.8.0",
+    "i18n-js": "^4.5.4",
     "netcode": "^2.0.5",
     "prop-types": "^15.8.1",
     "react": "^19.3.1",
