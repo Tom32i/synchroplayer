@@ -11,7 +11,7 @@ const resolve = {
   }
 };
 
-const clientConfig = env => ({
+const clientConfig = (env, argv) => ({
   target: 'web',
   entry: './src/client/index.js',
   output: {
@@ -25,7 +25,13 @@ const clientConfig = env => ({
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: { presets: ['@babel/preset-env', '@babel/preset-react'] }
+          options: {
+            presets: [
+              '@babel/preset-env',
+              // Babel 8 picks the dev JSX runtime unless told otherwise
+              [ '@babel/preset-react', { development: argv.mode === 'development' } ],
+            ],
+          }
         }
       },
       {
@@ -38,11 +44,9 @@ const clientConfig = env => ({
       },
       {
         test: /\.(svg|ttf|woff|png)$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            name: '[path][name].[ext]',
-          },
+        type: 'asset/resource',
+        generator: {
+          filename: '[path][name][ext]',
         },
       },
     ]
@@ -80,4 +84,4 @@ const serverConfig = env => ({
   resolve,
 });
 
-module.exports = env => [ serverConfig(env), clientConfig(env) ];
+module.exports = (env, argv) => [ serverConfig(env), clientConfig(env, argv) ];
