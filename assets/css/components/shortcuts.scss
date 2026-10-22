@@ -1,3 +1,5 @@
+@use '@css/core/variables';
+
 .shortcuts {
     width: 100%;
 }
@@ -14,8 +16,8 @@
     }
 
     .shortcut {
-        background-color: $color-light;
-        color: $color-dark;
+        background-color: variables.$color-light;
+        color: variables.$color-dark;
         border-radius: 2px;
         padding: 0.2em 0.4em;
         white-space: nowrap;
