@@ -112,9 +112,9 @@ class Controls extends Component {
                     <Button disabled={!loaded} label={<span className="icon-stop" />} onClick={onStop} />
                 </div>
                 <div className="group">
-                    <Button disabled={!loaded} label={<span className="icon-backward" onClick={onBackward} />} />
+                    <Button disabled={!loaded} label={<span className="icon-backward" />} onClick={onBackward} />
                     <Button disabled={!loaded} label={<span className={playIcon} />} onClick={this.togglePlay} />
-                    <Button disabled={!loaded} label={<span className="icon-forward" onClick={onForward} />} />
+                    <Button disabled={!loaded} label={<span className="icon-forward" />} onClick={onForward} />
                 </div>
                 <div className="group">
                     <VolumeControl />
