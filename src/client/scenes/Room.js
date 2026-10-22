@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import I18n from 'i18n-js';
+import i18n from '@client/translations';
 import Socket from '@client/components/Socket';
 import Player from '@client/components/Player';
 import UserList from '@client/components/UserList';
@@ -37,10 +37,10 @@ class Room extends Component {
         }
 
         if (source === 'file') {
-            return <div className="placeholder">{I18n.t('room.drop_file', { name })}</div>;
+            return <div className="placeholder">{i18n.t('room.drop_file', { name })}</div>;
         }
 
-        return <div className="placeholder">{I18n.t('room.drop_to_start')}</div>;
+        return <div className="placeholder">{i18n.t('room.drop_to_start')}</div>;
     }
 
     render(){

@@ -181,6 +181,9 @@ export default class Room {
     }
 
     onPeerOffer(data, client) {
+        // Streaming shares the loaded video: no video, no distributor.
+        if (!this.video) { return; }
+
         const user = this.users.get(client);
 
         if (!this.distributor) {
@@ -290,7 +293,7 @@ export default class Room {
 
         this.sendToAll('user:ready', user);
 
-        if (!user.ready) {
+        if (!user.ready && this.video) {
             this.video.pause();
         }
     }
