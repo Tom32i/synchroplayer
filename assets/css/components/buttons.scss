@@ -1,14 +1,17 @@
+@use 'sass:color';
+@use '@css/core/variables';
+
 .action {
     font-weight: bold;
     border-radius: 4px;
-    background-color: darken($color-primary, 15%);
+    background-color: color.adjust(variables.$color-primary, $lightness: -15%, $space: hsl);
     color: white;
     padding: 0.6em 1em;
     text-decoration: none;
     display: block;
 
     &:hover {
-        background-color: $color-primary;
+        background-color: variables.$color-primary;
     }
 }
 
@@ -31,10 +34,10 @@
     }
 
     &[disabled] {
-        color:  rgba($text-grey-light, 0.8);
+        color:  rgba(variables.$text-grey-light, 0.8);
     }
 
     &[disabled] .icon-loader {
-        color: $color-primary;
+        color: variables.$color-primary;
     }
 }

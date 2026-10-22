@@ -1,6 +1,8 @@
+@use '@css/core/variables';
+
 $track-color: rgba(white, 0.5);
 $thumb-color: white;
-$fill-color: $color-primary;
+$fill-color: variables.$color-primary;
 
 $track-width: 12rem;
 $track-height: 0.4rem;

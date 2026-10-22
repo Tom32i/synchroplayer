@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use '@css/core/variables';
+
 .top-bar {
     display: flex;
     align-items: center;
@@ -15,12 +18,12 @@
         height: 64px;
         width: 210px;
         line-height: 64px;
-        color: $color-primary;
+        color: variables.$color-primary;
         text-shadow: 0 0.1em 0.1em rgba(black, 0.5);
         text-decoration: none;
 
         &:hover {
-            color: lighten($color-primary, 10%);
+            color: color.adjust(variables.$color-primary, $lightness: 10%, $space: hsl);
         }
     }
 
