@@ -1,7 +1,6 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import I18n from 'i18n-js';
+import i18n from '@client/translations';
 import { close } from '@client/store/about';
 import Modal from '@client/components/Modal';
 
@@ -12,7 +11,7 @@ function AboutModal(props) {
 
     return (
         <Modal className="modal--large">
-            <h4 className="title">{I18n.t('about.title')}</h4>
+            <h4 className="title">{i18n.t('about.title')}</h4>
             <p className="message">
                 Synchroplayer permet de regarder des vidéos, à plusieurs, en synchronisant automatiquement la lecture pour tous les participants.
             </p>
@@ -50,11 +49,11 @@ function AboutModal(props) {
 
             <h5 className="subtitle">Ce projet est open-source</h5>
             <a className="action" href="https://github.com/Tom32i/synchroplayer" target="_blank" rel="noreferrer">
-                {I18n.t('about.github_link')}
+                {i18n.t('about.github_link')}
             </a>
 
             <button className="action" onClick={props.close}>
-                {I18n.t('about.close')}
+                {i18n.t('about.close')}
             </button>
         </Modal>
     );

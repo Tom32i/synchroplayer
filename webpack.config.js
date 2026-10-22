@@ -1,3 +1,4 @@
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const resolve = {
@@ -9,12 +10,12 @@ const resolve = {
   }
 };
 
-const clientConfig = {
+const clientConfig = (env, argv) => ({
   target: 'web',
   entry: './src/client/index.js',
   output: {
     filename: 'client.js',
-    path: `${__dirname}/build`,
+    path: path.resolve(__dirname, env.root || '.', 'build'),
   },
   module: {
     rules: [
@@ -23,7 +24,13 @@ const clientConfig = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: { presets: ['@babel/preset-env', '@babel/preset-react'] }
+          options: {
+            presets: [
+              '@babel/preset-env',
+              // Babel 8 picks the dev JSX runtime unless told otherwise
+              [ '@babel/preset-react', { development: argv.mode === 'development' } ],
+            ],
+          }
         }
       },
       {
@@ -36,22 +43,25 @@ const clientConfig = {
       },
       {
         test: /\.(svg|ttf|woff|png)$/,
-        type: 'asset/resource'
+        type: 'asset/resource',
+        generator: {
+          filename: '[path][name][ext]',
+        },
       },
     ]
   },
   resolve,
   plugins: [
-    new HtmlWebpackPlugin({ template: './index.html' })
+    new HtmlWebpackPlugin({ template: './index.html' }),
   ]
-};
+});
 
-const serverConfig = {
+const serverConfig = env => ({
   target: 'node',
   entry: './src/server/index.js',
   output: {
     filename: 'server.js',
-    path: `${__dirname}/bin`,
+    path: path.resolve(__dirname, env.root || '.', 'bin'),
   },
   module: {
     rules: [
@@ -61,13 +71,13 @@ const serverConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [[ '@babel/preset-env', { targets: { node: true } } ]],
+            presets: [[ '@babel/preset-env', { targets: { node: '24' } } ]],
           }
         }
       }
     ]
   },
   resolve,
-};
+});
 
-module.exports = [ serverConfig, clientConfig ];
+module.exports = (env, argv) => [ serverConfig(env), clientConfig(env, argv) ];

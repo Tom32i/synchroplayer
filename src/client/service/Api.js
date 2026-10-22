@@ -1,5 +1,4 @@
-import Client from 'netcode/src/client/Client';
-import BinaryEncoder from 'netcode/src/encoder/BinaryEncoder';
+import { Client, BinaryEncoder } from 'netcode/client';
 import events from '@events';
 
 export default class Api {

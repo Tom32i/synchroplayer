@@ -1,7 +1,6 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import I18n from 'i18n-js';
+import i18n from '@client/translations';
 import { get } from '@client/container';
 import Modal from '@client/components/Modal';
 
@@ -12,10 +11,10 @@ function AuthorizationModal(props) {
 
     return (
         <Modal>
-            <h4 className="title">{I18n.t('player.authorization.title')}</h4>
-            <p className="message">{I18n.t('player.authorization.content')}</p>
+            <h4 className="title">{i18n.t('player.authorization.title')}</h4>
+            <p className="message">{i18n.t('player.authorization.content')}</p>
             <button className="action" onClick={get('api').play}>
-                {I18n.t('player.authorization.ok')}
+                {i18n.t('player.authorization.ok')}
             </button>
         </Modal>
     );
