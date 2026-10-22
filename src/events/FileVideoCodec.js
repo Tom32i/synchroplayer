@@ -1,16 +1,16 @@
-import { Codec, StringCodec, UInt16Codec } from 'netcode/encoder';
+import { Codec, StringLongCodec, UInt16Codec } from 'netcode/encoder';
 
 export default class FileVideoCodec extends Codec {
     constructor() {
         super();
 
         this.uint16Codec = new UInt16Codec();
-        this.stringCodec = new StringCodec();
+        this.stringLongCodec = new StringLongCodec();
     }
 
     getByteLength(data) {
         return this.uint16Codec.getByteLength()
-            + this.stringCodec.getByteLength(data.name);
+            + this.stringLongCodec.getByteLength(data.name);
     }
 
     encode(buffer, offset, data) {
@@ -20,7 +20,7 @@ export default class FileVideoCodec extends Codec {
 
         offset += this.uint16Codec.getByteLength();
 
-        this.stringCodec.encode(buffer, offset, name);
+        this.stringLongCodec.encode(buffer, offset, name);
     }
 
     decode(buffer, offset) {
@@ -28,7 +28,7 @@ export default class FileVideoCodec extends Codec {
 
         offset += this.uint16Codec.getByteLength();
 
-        const name = this.stringCodec.decode(buffer, offset);
+        const name = this.stringLongCodec.decode(buffer, offset);
 
         return { name, duration };
     }
