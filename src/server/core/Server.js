@@ -12,6 +12,7 @@ export default class Server extends NetcodeServer {
         this.onRequest = this.onRequest.bind(this);
         this.onJoin = this.onJoin.bind(this);
         this.onLeave = this.onLeave.bind(this);
+        this.onClientError = this.onClientError.bind(this);
 
         this.start();
     }
@@ -89,6 +90,8 @@ export default class Server extends NetcodeServer {
      * @param {Request} request
      */
     onJoin(client, request) {
+        client.on('error', this.onClientError);
+
         const attributes = this.joinMatcher.exec(request.url);
 
         // Should not happen...
@@ -112,6 +115,12 @@ export default class Server extends NetcodeServer {
     onLeave(client) {
         console.info(`Client ${client.id} left.`);
     }
+
+    /**
+     * Netcode already logs the error and closes the socket,
+     * but an 'error' event with no listener would crash the process.
+     */
+    onClientError() {}
 
     /**
      * On error

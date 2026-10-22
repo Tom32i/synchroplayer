@@ -182,7 +182,7 @@ export default class Room {
 
         this.send('user:ready', user);
 
-        if (!user.ready) {
+        if (!user.ready && this.video) {
             this.video.pause();
         }
     }
