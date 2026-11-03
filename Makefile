@@ -44,6 +44,14 @@ start-client:
 start-server:
 	node bin/server.js 8001
 
+# Bump the version, commit and tag it: version@patch, version@minor, version@major
+version@%:
+	npm version $* -m "v%s"
+
 # Publish package
 publish: build
 	npm publish . --access public
+
+# Create the GitHub release of the latest tag, once it is pushed
+release:
+	gh release create "$$(git describe --tags --abbrev=0)" --verify-tag --generate-notes
