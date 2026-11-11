@@ -13,22 +13,16 @@ export default class FileVideoCodec extends Codec {
             + this.stringLongCodec.getByteLength(data.name);
     }
 
-    encode(buffer, offset, data) {
+    encode(cursor, data) {
         const { name, duration } = data;
 
-        this.uint16Codec.encode(buffer, offset, duration);
-
-        offset += this.uint16Codec.getByteLength();
-
-        this.stringLongCodec.encode(buffer, offset, name);
+        this.uint16Codec.encode(cursor, duration);
+        this.stringLongCodec.encode(cursor, name);
     }
 
-    decode(buffer, offset) {
-        const duration = this.uint16Codec.decode(buffer, offset);
-
-        offset += this.uint16Codec.getByteLength();
-
-        const name = this.stringLongCodec.decode(buffer, offset);
+    decode(cursor) {
+        const duration = this.uint16Codec.decode(cursor);
+        const name = this.stringLongCodec.decode(cursor);
 
         return { name, duration };
     }

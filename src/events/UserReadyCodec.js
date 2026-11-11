@@ -13,22 +13,16 @@ export default class UserReadyCodec extends Codec {
             + this.booleanCodec.getByteLength();
     }
 
-    encode(buffer, offset, data) {
+    encode(cursor, data) {
         const { id, ready } = data;
 
-        this.uint8Codec.encode(buffer, offset, id);
-
-        offset += this.uint8Codec.getByteLength();
-
-        this.booleanCodec.encode(buffer, offset, ready);
+        this.uint8Codec.encode(cursor, id);
+        this.booleanCodec.encode(cursor, ready);
     }
 
-    decode(buffer, offset) {
-        const id = this.uint8Codec.decode(buffer, offset);
-
-        offset += this.uint8Codec.getByteLength();
-
-        const ready = this.booleanCodec.decode(buffer, offset);
+    decode(cursor) {
+        const id = this.uint8Codec.decode(cursor);
+        const ready = this.booleanCodec.decode(cursor);
 
         return { id, ready };
     }
