@@ -12,22 +12,16 @@ export default class UrlVideoCodec extends Codec {
             + this.stringLongCodec.getByteLength(data.url);
     }
 
-    encode(buffer, offset, data) {
+    encode(cursor, data) {
         const { url, name } = data;
 
-        this.stringLongCodec.encode(buffer, offset, name);
-
-        offset += this.stringLongCodec.getByteLength(name);
-
-        this.stringLongCodec.encode(buffer, offset, url);
+        this.stringLongCodec.encode(cursor, name);
+        this.stringLongCodec.encode(cursor, url);
     }
 
-    decode(buffer, offset) {
-        const name = this.stringLongCodec.decode(buffer, offset);
-
-        offset += this.stringLongCodec.getByteLength(name);
-
-        const url = this.stringLongCodec.decode(buffer, offset);
+    decode(cursor) {
+        const name = this.stringLongCodec.decode(cursor);
+        const url = this.stringLongCodec.decode(cursor);
 
         return { url, name };
     }
