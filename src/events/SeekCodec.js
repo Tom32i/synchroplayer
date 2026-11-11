@@ -11,13 +11,13 @@ export default class SeekCodec extends Codec {
         return this.uint32Codec.getByteLength();
     }
 
-    encode(buffer, offset, data) {
+    encode(cursor, data) {
         // Seconds to milliseconds
-        this.uint32Codec.encode(buffer, offset, data * 1000);
+        this.uint32Codec.encode(cursor, data * 1000);
     }
 
-    decode(buffer, offset) {
+    decode(cursor) {
         // Milliseconds to seconds
-        return this.uint32Codec.decode(buffer, offset) / 1000;
+        return this.uint32Codec.decode(cursor) / 1000;
     }
 }
